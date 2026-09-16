@@ -34,7 +34,7 @@
 
   <div class="page-eyebrow">WRITE</div>
   <h1 class="page-title" id="page-title">새 독서기록 작성</h1>
-  <p class="page-desc">오늘 읽은 책을 한 줄부터 차근차근 적어보세요. 작성 가이드는 AI가 아니라, 생각을 정리하는 데 도움을 주는 질문이에요.</p>
+  <p class="page-desc">필수 항목만 쓰면 바로 저장돼요. 나머지는 펼쳐서 차근차근 채워도 좋아요.</p>
 
   <!-- ===== 로그인 안내 ===== -->
   <div id="auth-required" class="card" style="display:none;text-align:center;padding:40px 20px;">
@@ -47,39 +47,22 @@
 
   <!-- ===== 작성 폼 ===== -->
   <form id="record-form" class="card" style="display:none;">
+
+    <!-- ===== 1) 핵심 (필수) ===== -->
+    <div class="form-step">📝 1단계 · 오늘 읽은 책을 짧게</div>
+
     <div class="two-cols">
       <div class="form-group">
         <label for="title">책 제목 <span class="req">*</span></label>
         <input type="text" id="title" maxlength="120" placeholder="예: 어린 왕자">
       </div>
       <div class="form-group">
-        <label for="author">저자</label>
-        <input type="text" id="author" maxlength="80" placeholder="예: 생텍쥐페리">
-      </div>
-      <div class="form-group">
-        <label for="publisher">출판사</label>
-        <input type="text" id="publisher" maxlength="80">
-      </div>
-      <div class="form-group">
-        <label for="isbn">ISBN</label>
-        <input type="text" id="isbn" maxlength="30">
-      </div>
-      <div class="form-group">
-        <label for="category">카테고리</label>
-        <select id="category"></select>
-      </div>
-      <div class="form-group">
         <label for="reading-status">독서 상태 <span class="req">*</span></label>
         <select id="reading-status"></select>
       </div>
-      <div class="form-group">
-        <label for="started-at">시작일</label>
-        <input type="date" id="started-at">
-      </div>
-      <div class="form-group">
-        <label for="finished-at">완료일</label>
-        <input type="date" id="finished-at">
-      </div>
+    </div>
+
+    <div class="two-cols">
       <div class="form-group">
         <label for="reading-date">읽은 날짜</label>
         <input type="date" id="reading-date">
@@ -101,89 +84,6 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="summary">줄거리 요약 <span class="hint">(누가 · 무엇을 · 어떻게)</span></label>
-      <textarea id="summary" maxlength="4000" placeholder="조금씩 적어도 괜찮아요. 기억나는 장면부터 적어보세요."></textarea>
-      <div class="prompt-box">
-        <details>
-          <summary>작성 질문 보기</summary>
-          <ul class="prompt-list" id="prompt-summary"></ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="memorable-sentence">기억에 남는 문장</label>
-      <textarea id="memorable-sentence" maxlength="2000"></textarea>
-      <div class="prompt-box">
-        <details>
-          <summary>작성 질문 보기</summary>
-          <ul class="prompt-list" id="prompt-memorable_sentence"></ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="feeling">느낀 점</label>
-      <textarea id="feeling" maxlength="4000"></textarea>
-      <div class="prompt-box">
-        <details>
-          <summary>작성 질문 보기</summary>
-          <ul class="prompt-list" id="prompt-feeling"></ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="learned">배운 점</label>
-      <textarea id="learned" maxlength="4000"></textarea>
-      <div class="prompt-box">
-        <details>
-          <summary>작성 질문 보기</summary>
-          <ul class="prompt-list" id="prompt-learned"></ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="action-plan">나에게 적용할 점</label>
-      <textarea id="action-plan" maxlength="4000"></textarea>
-      <div class="prompt-box">
-        <details>
-          <summary>작성 질문 보기</summary>
-          <ul class="prompt-list" id="prompt-action_plan"></ul>
-        </details>
-      </div>
-    </div>
-
-    <div class="two-cols">
-      <div class="form-group">
-        <label for="favorite-character">좋아하는 인물</label>
-        <input type="text" id="favorite-character" maxlength="80">
-        <div class="prompt-box">
-          <details>
-            <summary>작성 질문 보기</summary>
-            <ul class="prompt-list" id="prompt-favorite_character"></ul>
-          </details>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="question-after-reading">읽고 난 뒤 생긴 질문</label>
-        <textarea id="question-after-reading" maxlength="2000"></textarea>
-        <div class="prompt-box">
-          <details>
-            <summary>작성 질문 보기</summary>
-            <ul class="prompt-list" id="prompt-question_after_reading"></ul>
-          </details>
-        </div>
-      </div>
-    </div>
-
-    <details class="prompt-box" style="margin:4px 0 16px;">
-      <summary>독후감 채우기 템플릿 (줄거리에 순서대로 붙이면 돼요)</summary>
-      <ul class="prompt-list" id="templates"></ul>
-    </details>
-
     <div class="form-group" style="max-width:320px;">
       <label for="visibility">공개 여부 <span class="req">*</span></label>
       <select id="visibility">
@@ -192,6 +92,130 @@
       </select>
       <span class="hint" style="color:var(--muted);font-size:12px;">공개 기록은 홈과 공개 목록에서 다른 사람에게 보일 수 있어요.</span>
     </div>
+
+    <!-- ===== 2) 도서 정보 (선택) ===== -->
+    <details class="opt-box">
+      <summary>📚 도서 정보 자세히 <span class="opt-sub" style="margin-left:auto;margin-right:18px;">(선택)</span></summary>
+      <div class="opt-body">
+        <div class="two-cols">
+          <div class="form-group">
+            <label for="author">저자</label>
+            <input type="text" id="author" maxlength="80" placeholder="예: 생텍쥐페리">
+          </div>
+          <div class="form-group">
+            <label for="publisher">출판사</label>
+            <input type="text" id="publisher" maxlength="80">
+          </div>
+          <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" maxlength="30">
+          </div>
+          <div class="form-group">
+            <label for="category">카테고리</label>
+            <select id="category"></select>
+          </div>
+          <div class="form-group">
+            <label for="started-at">시작일</label>
+            <input type="date" id="started-at">
+          </div>
+          <div class="form-group">
+            <label for="finished-at">완료일</label>
+            <input type="date" id="finished-at">
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ===== 3) 독서노트 자세히 (선택) ===== -->
+    <details class="opt-box">
+      <summary>📝 독서노트 자세히 <span class="opt-sub" style="margin-left:auto;margin-right:18px;">(선택)</span></summary>
+      <div class="opt-body">
+
+        <details class="prompt-box" style="margin:0 0 14px;">
+          <summary>독후감 채우기 템플릿 (줄거리에 순서대로 붙이면 돼요)</summary>
+          <ul class="prompt-list" id="templates"></ul>
+        </details>
+
+        <div class="form-group">
+          <label for="summary">줄거리 요약 <span class="hint">(누가 · 무엇을 · 어떻게)</span></label>
+          <textarea id="summary" maxlength="4000" placeholder="조금씩 적어도 괜찮아요. 기억나는 장면부터 적어보세요."></textarea>
+          <div class="prompt-box">
+            <details>
+              <summary>작성 질문 보기</summary>
+              <ul class="prompt-list" id="prompt-summary"></ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="memorable-sentence">기억에 남는 문장</label>
+          <textarea id="memorable-sentence" maxlength="2000"></textarea>
+          <div class="prompt-box">
+            <details>
+              <summary>작성 질문 보기</summary>
+              <ul class="prompt-list" id="prompt-memorable_sentence"></ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="feeling">느낀 점</label>
+          <textarea id="feeling" maxlength="4000"></textarea>
+          <div class="prompt-box">
+            <details>
+              <summary>작성 질문 보기</summary>
+              <ul class="prompt-list" id="prompt-feeling"></ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="learned">배운 점</label>
+          <textarea id="learned" maxlength="4000"></textarea>
+          <div class="prompt-box">
+            <details>
+              <summary>작성 질문 보기</summary>
+              <ul class="prompt-list" id="prompt-learned"></ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="action-plan">나에게 적용할 점</label>
+          <textarea id="action-plan" maxlength="4000"></textarea>
+          <div class="prompt-box">
+            <details>
+              <summary>작성 질문 보기</summary>
+              <ul class="prompt-list" id="prompt-action_plan"></ul>
+            </details>
+          </div>
+        </div>
+
+        <div class="two-cols">
+          <div class="form-group">
+            <label for="favorite-character">좋아하는 인물</label>
+            <input type="text" id="favorite-character" maxlength="80">
+            <div class="prompt-box">
+              <details>
+                <summary>작성 질문 보기</summary>
+                <ul class="prompt-list" id="prompt-favorite_character"></ul>
+              </details>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="question-after-reading">읽고 난 뒤 생긴 질문</label>
+            <textarea id="question-after-reading" maxlength="2000"></textarea>
+            <div class="prompt-box">
+              <details>
+                <summary>작성 질문 보기</summary>
+                <ul class="prompt-list" id="prompt-question_after_reading"></ul>
+              </details>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </details>
 
     <div class="field-actions">
       <button type="button" class="btn btn-outline" id="cancel-btn">취소</button>

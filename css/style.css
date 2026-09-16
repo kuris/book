@@ -279,6 +279,29 @@ h2.sec-title { margin: 26px 0 10px; font-size: 18px; font-weight: 800; }
 
 /* ---------- 폼 (작성/수정) ---------- */
 .form-group { margin-bottom: 16px; }
+
+/* 필수 항목 바로 위 단계 안내 */
+.form-step { font-size: 13px; font-weight: 800; color: var(--key); margin: 4px 0 12px; letter-spacing: .04em; }
+
+/* 선택 항목 접이식 박스 */
+.opt-box {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.opt-box summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 800; font-size: 15px; color: var(--ink);
+  display: flex; align-items: center; gap: 6px;
+}
+.opt-box summary::-webkit-details-marker { display: none; }
+.opt-box summary::after { content: '▾'; margin-left: auto; color: var(--muted); transition: transform .12s; }
+.opt-box[open] summary::after { transform: rotate(180deg); }
+.opt-box .opt-sub { color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 2px; }
+.opt-box[open] .opt-body { margin-top: 14px; }
 .form-group > label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 14px; }
 .form-group .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
 .form-group input[type="text"],
