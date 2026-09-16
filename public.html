@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>독서기록 상세 - 독서야 놀자!</title>
-<meta name="description" content="독서기록 상세 보기.">
-<link rel="canonical" href="https://book.chatgpts.kr/view.html">
+<title>공개 독서기록 - 독서야 놀자!</title>
+<meta name="description" content="다른 친구들이 공유한 공개 독서기록을 둘러보세요.">
+<link rel="canonical" href="https://book.chatgpts.kr/public.html">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,59 +27,21 @@
 
   <nav class="nav-scroll" id="book-nav" aria-label="주요 메뉴"></nav>
 
-  <!-- ===== 접근 불가 안내 (비공개/없음) ===== -->
-  <div id="auth-required" class="card" style="display:none;text-align:center;padding:40px 20px;">
-    <div style="font-size:44px;margin-bottom:12px;">🔒</div>
-    <h2 style="margin:0 0 8px;">이 기록을 볼 수 없어요</h2>
-    <p style="color:var(--ink-soft);margin:0 0 20px;">비공개 기록은 작성자만 볼 수 있어요.<br>로그인하면 내가 쓴 기록을 확인할 수 있어요.</p>
-    <button type="button" class="btn btn-primary" data-cg="login">Google로 로그인</button>
-    <p style="margin-top:14px;"><a href="public.html" class="btn btn-outline btn-sm">공개 기록 보기</a></p>
+  <div class="page-eyebrow">PUBLIC</div>
+  <h1 class="page-title">공개 독서기록</h1>
+  <p class="page-desc">다른 친구들이 공개한 기록을 구경해 보세요. 감동의 한 줄이 나를 책으로 안내할 거예요.</p>
+
+  <div class="toolbar" style="justify-content:flex-end;">
+    <a href="write.html" class="btn btn-primary btn-sm">✍️ 나도 기록하기</a>
   </div>
 
-  <!-- ===== 상세 내용 ===== -->
-  <div id="record-detail" class="card" style="display:none;">
-    <div class="detail-head">
-      <h1 class="detail-title" id="v-title"></h1>
-      <div class="detail-meta" id="v-meta"></div>
-    </div>
+  <div id="empty-state" class="empty card" style="display:block;margin:10px 0 0;">
+    아직 공개된 기록이 없어요. 첫 공개 기록을 남겨보세요! 🚀
+  </div>
+  <div class="record-grid" id="public-grid" style="margin-top:10px;"></div>
 
-    <div class="one-line" id="v-one"></div>
-
-    <div class="detail-section" id="v-section-summary">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-memorable_sentence">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-feeling">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-learned">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-action_plan">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-favorite_character">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-    <div class="detail-section" id="v-section-question_after_reading">
-      <h3 class="sec-label"></h3>
-      <div class="body"></div>
-    </div>
-
-    <div class="detail-actions">
-      <a href="records.html" class="btn btn-outline">← 목록으로</a>
-      <span class="spacer"></span>
-      <button type="button" class="btn btn-primary" id="v-edit" style="display:none;">수정</button>
-      <button type="button" class="btn btn-danger" id="v-delete" style="display:none;">삭제</button>
-    </div>
+  <div style="text-align:center;margin:20px 0;">
+    <button type="button" class="btn btn-outline" id="load-more" style="display:none;">더 보기</button>
   </div>
 
   <footer class="site-foot">
@@ -106,7 +68,7 @@
 <script defer src="js/book-data.js"></script>
 <script defer src="js/book-sync.js"></script>
 <script defer src="js/nav.js"></script>
-<script defer src="js/view.js"></script>
+<script defer src="js/public.js"></script>
 <script defer src="js/track.js" data-service="book"></script>
 </body>
 </html>

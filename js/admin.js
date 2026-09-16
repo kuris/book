@@ -36,6 +36,7 @@
     { key: 'work',     name: '워크야 놀자',   emoji: '職', url: 'https://work.chatgpts.kr/admin' },
     { key: 'money',    name: '머니야 놀자',   emoji: '財', url: 'https://money.chatgpts.kr/admin' },
     { key: 'tools',    name: '문서야 놀자',   emoji: '文', url: 'https://tools.chatgpts.kr/admin' },
+    { key: 'book',     name: '독서야 놀자',   emoji: '📚', url: 'https://book.chatgpts.kr/admin' },
     { key: 'bible',    name: '성경아 놀자',   emoji: '聖', url: 'https://bible.chatgpts.kr/admin' },
     { key: 'maum',     name: '마음아 놀자',   emoji: '休', url: 'https://maum.chatgpts.kr/admin' }
   ];

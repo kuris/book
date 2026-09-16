@@ -1,117 +1,124 @@
-# 📚 독서야 놀자! - 책 읽고 기록하는 어린이 독서장
+# 📚 독서야 놀자! (book.chatgpts.kr)
 
-## 서비스 소개
+책 읽고 기록하는 어린이 독서장. 로그인한 사용자가 자신의 독서기록을 작성·조회·수정·삭제하고, 나만의 독서 통계를 볼 수 있는 정적 웹앱입니다.
 
-"독서야 놀자!"는 사용자가 자신의 독서 기록을 작성, 조회, 수정, 삭제할 수 있는 웹 기반 독서 기록 앱입니다. 읽은 책에 대한 한 줄 느낌, 줄거리 요약, 기억에 남는 문장, 느낀 점 등 다양한 요소를 기록하며 자신만의 독서 습관을 만들어갈 수 있습니다. 특히 초등학생부터 성인까지 누구나 쉽게 사용할 수 있는 깔끔하고 따뜻한 디자인을 지향합니다.
-
-**중요: 이 서비스에는 AI 기능이 없습니다.**
-여기서 말하는 "프롬프트"는 AI 프롬프트가 아니라 사용자가 독서 기록을 더 쉽게 작성하도록 돕는 "작성 질문", "가이드 문구", "독서 템플릿"을 의미합니다.
+> **AI 기능이 없습니다.** 여기서 말하는 "프롬프트/작성 가이드" 는 AI 가 아니라
+> 기록을 쉽게 쓰도록 돕는 **정적 질문과 독서 템플릿**입니다. 어떤 작성 내용도 네트워크로 전송되지 않습니다.
 
 ## 주요 기능
 
-- **독서 기록 작성:** 책 제목 (필수), 저자, 출판사, ISBN, 카테고리, 독서 상태, 시작일/완료일, 별점, 한 줄 느낌, 상세 내용 (줄거리, 느낀 점, 배운 점 등)을 기록합니다.
-- **작성 가이드/템플릿:** AI가 아닌 정적인 질문 가이드와 템플릿을 제공하여 기록 작성을 돕습니다.
-- **내 독서 기록:** 상태별 필터 (읽고 싶은 책, 읽는 중, 다 읽음, 잠시 멈춤), 공개 여부 필터, 검색, 정렬 기능이 있는 나만의 독서 기록 목록을 제공합니다.
-- **독서 기록 상세 보기:** 개별 독서 기록의 상세 내용을 확인하고, 작성자 본인에 한해 수정 및 삭제가 가능합니다.
-- **독서 통계:** 전체 기록 수, 독서 상태별 통계, 카테고리별 분포, 평균 별점 등 개인의 독서 패턴을 시각적으로 보여줍니다 (초기에는 간단한 카드/막대 그래프 형태).
-- **로그인/계정 관리:** Google 로그인을 통해 간편하게 서비스를 이용할 수 있으며, 모든 기록은 사용자 계정에 안전하게 저장됩니다.
-- **공개/비공개 설정:** 독서 기록의 공개 여부를 설정하여 다른 사용자와 공유하거나 자신만의 기록으로 보관할 수 있습니다.
+- **독서기록 작성** — 책 제목(필수)·저자·출판사·ISBN·카테고리·독서 상태·날짜·별점(1~5)·한 줄 느낌·줄거리·기억에 남는 문장·느낀 점·배운 점·나에게 적용할 점·좋아하는 인물·읽고 난 뒤 질문
+- **작성 가이드(비-AI)** — `js/prompts.js` 의 정적 질문/독후감 템플릿, 클릭 한 번으로 인용 삽입
+- **내 기록** — 상태·공개 여부 필터, 제목/저자/한 줄 검색, 정렬, 수정·삭제
+- **상세 보기 / 권한** — public 은 누구나, private 는 작성자만 (RLS 가 강제)
+- **공개 기록** — 비로그인 포함 누구나 최신 공개 기록 탐색
+- **통계** — 카테고리/상태 막대, 평균 별점, 최근 기록 (CSS 카드/바 차트, 차트 라이브러리 없음)
+- **Google 로그인** — 공통 `cg-auth.js` 재사용 (이메일/비밀번호 등 없음)
 
 ## 프로젝트 구조
 
 ```
 book/
-├── css/
-│   ├── style.css             # 서비스 고유 스타일
-│   └── cg-auth.css           # 공통 인증 UI 스타일 (복사본)
+├── index.html · public.html · records.html · write.html
+├── view.html · stats.html · login.html · admin.html
+├── css/  style.css · cg-auth.css(복사본) · admin.css(복사본)
 ├── js/
-│   ├── cg-auth.js            # 공통 인증 모듈 (복사본)
-│   ├── nav.js                # 메인 내비게이션 로직
-│   ├── main.js               # index.html 메인 로직, 최근 공개 기록 로딩
-│   ├── book-data.js          # 독서 상태, 카테고리 등 정적 데이터
-│   ├── prompts.js            # 독서 기록 작성 가이드 질문/템플릿
-│   ├── records.js            # records.html (내 기록 목록) 로직
-│   ├── write.js              # write.html (기록 작성/수정) 로직
-│   ├── view.js               # view.html (기록 상세 보기) 로직
-│   └── stats.js              # stats.html (독서 통계) 로직
-├── docs/
-│   ├── supabase-book-setup.md  # Supabase 스키마 및 RLS 설정 문서
-│   └── google-login-setup.md   # Google 로그인 설정 가이드 문서
-├── supabase/
-│   └── migrations/
-│       └── 001_book_schema.sql # book 스키마 및 records 테이블 생성 SQL
-├── index.html                # 메인 페이지
-├── records.html              # 내 독서 기록 목록
-├── write.html                # 독서 기록 작성/수정
-├── view.html                 # 독서 기록 상세 보기
-├── stats.html                # 독서 통계
-├── login.html                # 로그인 페이지
-├── admin.html                # 관리자 페이지 (최소 기능)
-├── README.md                 # 프로젝트 설명
-└── ads.txt                   # 광고 관련 파일
+│   ├── supabase-config.js      상수 (url/key/storageKey)
+│   ├── cg-auth.js              공통 로그인 모듈 (복사본, 직접 수정 금지)
+│   ├── book-data.js            상태/카테고리/별점/정렬 정적 데이터
+│   ├── book-sync.js            기록 CRUD 공통 계층 (public.book_records)
+│   ├── prompts.js              정적 작성 가이드(비-AI)
+│   ├── nav.js · main.js · records.js · write.js · view.js
+│   ├── stats.js · public.js · login.js
+│   ├── cg-ads.js · track.js    광고 조건부 로딩 · 화면 조회 로그
+│   ├── supabase-admin-client.js · admin.js(공용 템플릿) · admin-records.js
+├── docs/  supabase-book-setup.md · google-login-setup.md
+├── supabase/migrations/001_book_schema.sql   (= _shared/sql/08-book.sql 복사본)
+└── vercel.json · robots.txt · sitemap.xml · ads.txt
 ```
 
 ## 실행 방법
 
-이 프로젝트는 정적 HTML/CSS/JS 파일로 구성되어 있으며, 별도의 빌드 과정 없이 웹 서버에 배포하여 바로 실행할 수 있습니다.
-
-1.  **파일 복사:** `book` 폴더 전체를 웹 서버 (예: Nginx, Apache)의 문서 루트 또는 서브 디렉토리에 복사합니다.
-2.  **Supabase 설정:** 아래 "Supabase 설정 방법"을 참고하여 Supabase 프로젝트를 설정합니다.
-3.  **브라우저 접속:** 웹 서버를 통해 `index.html`에 접속합니다.
-
-## Supabase 설정 방법
-
-"독서야 놀자!" 서비스는 기존 chatgpts.kr 프로젝트의 Supabase 인스턴스를 공유하며, `book` 스키마를 사용하여 데이터가 분리됩니다. `auth.users` 테이블은 공통으로 사용합니다.
-
-### 1. `book` 스키마 생성 및 테이블 설정
-
-`book/supabase/migrations/001_book_schema.sql` 파일을 사용하여 Supabase 데이터베이스에 `book` 스키마와 `records` 테이블을 생성하고 RLS 정책을 설정합니다. Supabase CLI를 사용하여 마이그레이션을 적용하는 것을 권장합니다.
+정적 HTML/CSS/JS 단독 배포라 빌드 과정이 없습니다. 로컬에서 그냥 띄우면 됩니다.
 
 ```bash
-supabase db diff --schema book > supabase/migrations/001_book_schema.sql
-supabase migration up
+cd book
+python3 -m http.server 8070      # http://localhost:8070
+# 또는 npx serve . / Vercel 등 원하는 정적 서버
 ```
 
-또는 Supabase Studio SQL 편집기에서 `001_book_schema.sql` 내용을 직접 실행합니다.
+> ⚠ `file://` 로 열지 마세요. Supabase/Google OAuth 리다이렉트가 동작하지 않아 로그인이 안 됩니다.
 
-**필수 작업:**
+## Supabase 설정
 
-- `book` 스키마 생성
-- `book.records` 테이블 생성 및 필드 정의
-- `book.records` 테이블에 RLS (Row Level Security) 활성화
-- `auth.users` 테이블과 `user_id` 외래키 연결 (`ON DELETE CASCADE`)
-- 본인 데이터만 `INSERT`/`UPDATE`/`DELETE` 가능한 정책 정의
-- `private` 기록은 작성자만, `public` 기록은 누구나 `SELECT` 가능한 정책 정의
-- `public.service_members` 테이블에 `service='book'` 가입 처리 로직 (필요시 SQL 추가)
-- `updated_at` 필드 자동 갱신 트리거/함수 (`handle_updated_at` 등 기존 프로젝트에서 재사용)
+같은 Supabase 프로젝트(`ybhiznlelnpwaicyoifa`)를 공유하고, 데이터는 `public.book_records` 테이블 하나에 담습니다.
 
-### 2. Google 로그인 Redirect URL 설정
+Supabase 대시보드 > SQL Editor 에서 아래를 **순서대로** 실행합니다.
 
-Supabase 프로젝트 설정에서 Authentication -> URL Configuration 에 다음 Redirect URL을 추가해야 합니다.
+1. `play_project/_shared/sql/` **01~06** (이미 다른 놀자 서비스용으로 실행됐다면 건너뜀)
+2. `book/supabase/migrations/001_book_schema.sql` (원본 `_shared/sql/08-book.sql`)
 
-- `https://book.chatgpts.kr/`
-- `https://book.chatgpts.kr/login.html`
+`001_book_schema.sql` 이 하는 일:
+- `public.book_records` 테이블 + 제약(빈 제목 금지, 별점 1~5, 상태/공개 enum) + 인덱스
+- RLS 활성화 + 4개 `cg_` 정책(공개 조회 / 본인 전권 / 관리자 조회 / 관리자 비공개 전환)
+- `updated_at` 자동 갱신 트리거(공용 `cg_touch_updated_at()` 재사용)
+- 권한 부여(anon=select, authenticated=전체, service_role=전체)
 
-로컬 개발 환경에서는 `http://localhost:5500/book/` (또는 개발 서버 포트)도 추가할 수 있습니다.
+### Google 로그인 Redirect URL (Supabase → Authentication → URL Configuration)
 
-### 3. Supabase API Exposed schemas 설정
+```
+https://book.chatgpts.kr/**
+https://book.chatgpts.kr/login.html
+http://localhost:*/**
+```
 
-Supabase 프로젝트 설정 -> API -> API Settings -> Exposed schemas에 `book`을 추가하여 `book` 스키마의 테이블에 Supabase 클라이언트를 통해 접근할 수 있도록 허용해야 합니다.
+Google Cloud OAuth 클라이언트의 **승인된 리디렉션 URI**는 사이트가 아니라
+`https://ybhiznlelnpwaicyoifa.supabase.co/auth/v1/callback` 하나입니다 (자세한 건 docs/google-login-setup.md).
 
-### 4. `CGAuth` 모듈 설정
+## 데이터 모델 · RLS
 
-`book/js/cg-auth.js`는 `_shared/cg-auth.js`의 복사본이며, `data-service="book"` 속성을 통해 "독서야 놀자!" 서비스임을 명시합니다. 이 모듈은 Supabase 클라이언트 초기화 및 인증 처리를 담당합니다.
+`public.book_records`
 
-## 배포 도메인
+| 필드 | 설명 |
+|---|---|
+| `title` (필수) | 책 제목 |
+| `author` · `publisher` · `isbn` · `category` | 도서 정보 |
+| `reading_status` | `want`(읽고 싶은 책) / `reading` / `done` / `paused` |
+| `started_at` · `finished_at` · `reading_date` | 날짜 (date) |
+| `rating` | 1~5 또는 null |
+| `one_line_review` · `summary` · `memorable_sentence` · `feeling` · `learned` · `action_plan` · `favorite_character` · `question_after_reading` | 본문 |
+| `visibility` | `private`(기본) / `public` |
+| `deleted_at` | soft delete — null 이 아닌 행은 목록에서 제외 |
 
-이 서비스는 `book.chatgpts.kr` 도메인으로 배포될 예정입니다.
+RLS 요약:
+- `public` 기록은 **누구나** select (anon 포함)
+- `private` 기록은 **작성자만**
+- insert/update/delete 는 `auth.uid() = user_id` 인 행만
+- 관리자(`profiles.role='admin'`, 폴백 `phiskim@gmail.com`)는 전체 조회 + 비공개 전환/soft delete
+- 삭제는 실제 delete 가 아니라 `deleted_at = now()`
 
-## 광고 관련
+## 보안
 
-`ads.txt` 파일은 웹 사이트의 광고 수익화를 위해 사용될 수 있습니다. 필요에 따라 내용을 업데이트할 수 있습니다.
+- 데이터 보호는 **프론트 코드가 아니라 Supabase RLS**가 담당합니다.
+- 뷰 시간에 모든 사용자 입력을 **HTML escape** 하여 XSS 를 방지합니다.
+- query string `id` 는 검증 없이 그대로 조회하되, 비공개 기록은 RLS 로 차단됩니다.
+- 별점은 1~5 로, 빈 제목은 DB 제약으로 거부합니다.
 
-## 향후 계획
+## 배포 (book.chatgpts.kr)
 
-- `admin.html` 기능 확장
-- 더 다양한 통계 및 시각화 기능 추가
-- 독서 커뮤니티 기능 (예: 팔로우, 댓글) 고려
+- 정적 호스팅 루트 = `book/` 폴더 (Vercel 등)
+- `vercel.json` 에 cleanUrls(위생 URL), `/admin` → `admin.html`, 보안 헤더, 정적 자산 캐시가 이미 정의돼 있습니다.
+- 도메인 `book.chatgpts.kr` 을 호스팅에 연결한 뒤, Supabase Redirect URL 과 Google OAuth JavaScript origin 에 `https://book.chatgpts.kr` 을 추가하세요.
+- `ads.txt` 는 형제 서비스와 동일한 AdSense 계정입니다.
+
+## 관리자 (admin.html)
+
+- 판정: `public.profiles.role = 'admin'` (폴백 `phiskim@gmail.com`)
+- 탭: 화면 조회수 · **독서기록 관리** · 회원 · 화면별 통계 · 콘텐츠 · 시스템/SQL
+- **독서기록 관리**: 전체/공개/비공개/삭제 건수, 최근 100건, 부적절한 공개 기록을 비공개 전환 또는 soft delete
+
+## 향후 작업
+
+- 부모/교사용 독서 지도 공간
+- 좋아요/조회수 등 커뮤니티 요소
+- 공유 카드(OGP) 이미지 생성

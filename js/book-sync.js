@@ -72,7 +72,8 @@
       .eq('visibility', 'public')
       .is('deleted_at', null)
       .order(o.orderBy || 'created_at', { ascending: !!o.ascending });
-    if (o.limit) b = b.limit(o.limit);
+    if (o.offset) b = b.range(o.offset, o.offset + (o.limit || 20) - 1);
+    else if (o.limit) b = b.limit(o.limit);
     var r = await b;
     if (r.error) { warn('공개 기록 조회 실패', r.error); return { data: [], error: r.error }; }
     return { data: r.data || [], error: null };

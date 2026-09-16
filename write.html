@@ -1,235 +1,231 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>새 독서기록 작성 - 독서야 놀자!</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/cg-auth.css">
-    <style>
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="date"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-        }
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        .rating-input label {
-            display: inline-block;
-            margin-right: 10px;
-        }
-        .rating-input input[type="radio"] {
-            margin-right: 5px;
-        }
-        .prompt-container {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .prompt-container h3 {
-            color: var(--secondary-color);
-            margin-top: 0;
-        }
-        .prompt-list {
-            list-style: none;
-            padding: 0;
-        }
-        .prompt-list li {
-            background-color: var(--background-color);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .prompt-list li:hover {
-            background-color: #f0f0f0;
-        }
-        .form-actions {
-            margin-top: 30px;
-            text-align: right;
-        }
-        .form-actions .btn {
-            margin-left: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>새 독서기록 작성 - 독서야 놀자!</title>
+<meta name="description" content="오늘 읽은 책의 줄거리, 느낀 점, 기억에 남는 문장을 차근차근 기록하세요.">
+<link rel="canonical" href="https://book.chatgpts.kr/write.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="독서야 놀자">
+<meta property="og:title" content="독서기록 작성 - 독서야 놀자!">
+<meta property="og:url" content="https://book.chatgpts.kr/write.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/cg-auth.css">
+<meta name="robots" content="noindex, nofollow">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">📚 독서야 놀자!</div>
-            <nav id="main-nav"></nav>
-            <div id="cg-auth-slot"></div>
+<div class="wrap">
+
+  <header class="site-head">
+    <a href="index.html" class="brand-logo">
+      <span class="logo-char">📚</span>
+      <span>독서야 <span class="dot">놀자</span></span>
+    </a>
+    <div class="header-right"></div>
+  </header>
+
+  <nav class="nav-scroll" id="book-nav" aria-label="주요 메뉴"></nav>
+
+  <div class="page-eyebrow">WRITE</div>
+  <h1 class="page-title" id="page-title">새 독서기록 작성</h1>
+  <p class="page-desc">오늘 읽은 책을 한 줄부터 차근차근 적어보세요. 작성 가이드는 AI가 아니라, 생각을 정리하는 데 도움을 주는 질문이에요.</p>
+
+  <!-- ===== 로그인 안내 ===== -->
+  <div id="auth-required" class="card" style="display:none;text-align:center;padding:40px 20px;">
+    <div style="font-size:44px;margin-bottom:12px;">📖</div>
+    <h2 style="margin:0 0 8px;">기록을 쓰려면 로그인해 주세요</h2>
+    <p style="color:var(--ink-soft);margin:0 0 20px;">내 독서기록은 내 계정에 안전하게 저장되고,<br>휴대폰에서 쓴 것을 PC에서도 이어서 볼 수 있어요.</p>
+    <button type="button" class="btn btn-primary" data-cg="login">Google로 로그인</button>
+    <p style="color:var(--muted);font-size:13px;margin-top:16px;">로그인하지 않아도 홈과 공개 기록은 볼 수 있어요.</p>
+  </div>
+
+  <!-- ===== 작성 폼 ===== -->
+  <form id="record-form" class="card" style="display:none;">
+    <div class="two-cols">
+      <div class="form-group">
+        <label for="title">책 제목 <span class="req">*</span></label>
+        <input type="text" id="title" maxlength="120" placeholder="예: 어린 왕자">
+      </div>
+      <div class="form-group">
+        <label for="author">저자</label>
+        <input type="text" id="author" maxlength="80" placeholder="예: 생텍쥐페리">
+      </div>
+      <div class="form-group">
+        <label for="publisher">출판사</label>
+        <input type="text" id="publisher" maxlength="80">
+      </div>
+      <div class="form-group">
+        <label for="isbn">ISBN</label>
+        <input type="text" id="isbn" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label for="category">카테고리</label>
+        <select id="category"></select>
+      </div>
+      <div class="form-group">
+        <label for="reading-status">독서 상태 <span class="req">*</span></label>
+        <select id="reading-status"></select>
+      </div>
+      <div class="form-group">
+        <label for="started-at">시작일</label>
+        <input type="date" id="started-at">
+      </div>
+      <div class="form-group">
+        <label for="finished-at">완료일</label>
+        <input type="date" id="finished-at">
+      </div>
+      <div class="form-group">
+        <label for="reading-date">읽은 날짜</label>
+        <input type="date" id="reading-date">
+      </div>
+      <div class="form-group">
+        <label>별점</label>
+        <div class="star-row" id="rating-row"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="one-line-review">한 줄 느낌 <span class="hint">(이 책을 한 문장으로)</span></label>
+      <input type="text" id="one-line-review" maxlength="200" placeholder="예: 어른이 되어 다시 읽고 싶어지는 책">
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-one_line_review"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="summary">줄거리 요약 <span class="hint">(누가 · 무엇을 · 어떻게)</span></label>
+      <textarea id="summary" maxlength="4000" placeholder="조금씩 적어도 괜찮아요. 기억나는 장면부터 적어보세요."></textarea>
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-summary"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="memorable-sentence">기억에 남는 문장</label>
+      <textarea id="memorable-sentence" maxlength="2000"></textarea>
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-memorable_sentence"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="feeling">느낀 점</label>
+      <textarea id="feeling" maxlength="4000"></textarea>
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-feeling"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="learned">배운 점</label>
+      <textarea id="learned" maxlength="4000"></textarea>
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-learned"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="action-plan">나에게 적용할 점</label>
+      <textarea id="action-plan" maxlength="4000"></textarea>
+      <div class="prompt-box">
+        <details>
+          <summary>작성 질문 보기</summary>
+          <ul class="prompt-list" id="prompt-action_plan"></ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="two-cols">
+      <div class="form-group">
+        <label for="favorite-character">좋아하는 인물</label>
+        <input type="text" id="favorite-character" maxlength="80">
+        <div class="prompt-box">
+          <details>
+            <summary>작성 질문 보기</summary>
+            <ul class="prompt-list" id="prompt-favorite_character"></ul>
+          </details>
         </div>
-    </header>
-
-    <main>
-        <section class="container">
-            <h1 id="page-title">새 독서기록 작성</h1>
-            <div id="auth-required" style="display: none;">
-                <p>기록을 작성하려면 로그인해야 합니다. <button class="btn btn-primary" data-cg="login">Google로 로그인</button></p>
-            </div>
-            <div id="write-content" style="display: none;">
-                <form id="record-form">
-                    <input type="hidden" id="record-id">
-                    <div class="form-group">
-                        <label for="title">책 제목 <span style="color: red;">*</span></label>
-                        <input type="text" id="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="author">저자</label>
-                        <input type="text" id="author">
-                    </div>
-                    <div class="form-group">
-                        <label for="publisher">출판사</label>
-                        <input type="text" id="publisher">
-                    </div>
-                    <div class="form-group">
-                        <label for="isbn">ISBN</label>
-                        <input type="text" id="isbn">
-                    </div>
-                    <div class="form-group">
-                        <label for="category">카테고리</label>
-                        <select id="category">
-                            <!-- Options will be loaded from book-data.js -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reading-status">독서 상태 <span style="color: red;">*</span></label>
-                        <select id="reading-status" required>
-                            <!-- Options will be loaded from book-data.js -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="started-at">시작일</label>
-                        <input type="date" id="started-at">
-                    </div>
-                    <div class="form-group">
-                        <label for="finished-at">완료일</label>
-                        <input type="date" id="finished-at">
-                    </div>
-                    <div class="form-group">
-                        <label for="reading-date">읽은 날짜</label>
-                        <input type="date" id="reading-date">
-                    </div>
-                    <div class="form-group">
-                        <label>별점</label>
-                        <div class="rating-input">
-                            <input type="radio" id="rating-5" name="rating" value="5"><label for="rating-5">⭐⭐⭐⭐⭐</label>
-                            <input type="radio" id="rating-4" name="rating" value="4"><label for="rating-4">⭐⭐⭐⭐</label>
-                            <input type="radio" id="rating-3" name="rating" value="3"><label for="rating-3">⭐⭐⭐</label>
-                            <input type="radio" id="rating-2" name="rating" value="2"><label for="rating-2">⭐⭐</label>
-                            <input type="radio" id="rating-1" name="rating" value="1"><label for="rating-1">⭐</label>
-                            <input type="radio" id="rating-0" name="rating" value="" checked><label for="rating-0">없음</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="one-line-review">한 줄 느낌</label>
-                        <input type="text" id="one-line-review">
-                    </div>
-                    <div class="form-group">
-                        <label for="summary">줄거리 요약</label>
-                        <textarea id="summary"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 줄거리 요약</h3>
-                            <ul id="summary-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="memorable-sentence">기억에 남는 문장</label>
-                        <textarea id="memorable-sentence"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 기억에 남는 문장</h3>
-                            <ul id="memorable-sentence-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="feeling">느낀 점</label>
-                        <textarea id="feeling"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 느낀 점</h3>
-                            <ul id="feeling-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="learned">배운 점</label>
-                        <textarea id="learned"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 배운 점</h3>
-                            <ul id="learned-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="action-plan">나에게 적용할 점</label>
-                        <textarea id="action-plan"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 나에게 적용할 점</h3>
-                            <ul id="action-plan-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="favorite-character">좋아하는 인물</label>
-                        <input type="text" id="favorite-character">
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 좋아하는 인물</h3>
-                            <ul id="favorite-character-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="question-after-reading">읽고 난 뒤 생긴 질문</label>
-                        <textarea id="question-after-reading"></textarea>
-                        <div class="prompt-container">
-                            <h3>작성 가이드: 읽고 난 뒤 생긴 질문</h3>
-                            <ul id="question-prompts" class="prompt-list"></ul>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="visibility">공개 여부 <span style="color: red;">*</span></label>
-                        <select id="visibility" required>
-                            <option value="private">비공개 (나만 보기)</option>
-                            <option value="public">공개 (모두에게 공개)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">저장</button>
-                        <button type="button" id="temp-save-btn" class="btn btn-secondary">임시 저장</button>
-                        <button type="button" id="cancel-btn" class="btn btn-tertiary">취소</button>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 독서야 놀자!</p>
+      </div>
+      <div class="form-group">
+        <label for="question-after-reading">읽고 난 뒤 생긴 질문</label>
+        <textarea id="question-after-reading" maxlength="2000"></textarea>
+        <div class="prompt-box">
+          <details>
+            <summary>작성 질문 보기</summary>
+            <ul class="prompt-list" id="prompt-question_after_reading"></ul>
+          </details>
         </div>
-    </footer>
+      </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="js/nav.js"></script>
-    <script defer src="js/cg-auth.js" data-service="book" data-mount="#cg-auth-slot"></script>
-    <script defer src="js/book-data.js"></script>
-    <script defer src="js/prompts.js"></script>
-    <script defer src="js/write.js"></script>
+    <details class="prompt-box" style="margin:4px 0 16px;">
+      <summary>독후감 채우기 템플릿 (줄거리에 순서대로 붙이면 돼요)</summary>
+      <ul class="prompt-list" id="templates"></ul>
+    </details>
+
+    <div class="form-group" style="max-width:320px;">
+      <label for="visibility">공개 여부 <span class="req">*</span></label>
+      <select id="visibility">
+        <option value="private">🔒 비공개 · 나만 보기</option>
+        <option value="public">🌍 공개 · 누구나 보기</option>
+      </select>
+      <span class="hint" style="color:var(--muted);font-size:12px;">공개 기록은 홈과 공개 목록에서 다른 사람에게 보일 수 있어요.</span>
+    </div>
+
+    <div class="field-actions">
+      <button type="button" class="btn btn-outline" id="cancel-btn">취소</button>
+      <button type="button" class="btn btn-accent" id="temp-save-btn">임시 저장</button>
+      <button type="submit" class="btn btn-primary">저장</button>
+    </div>
+  </form>
+
+  <footer class="site-foot">
+    <div class="foot-links">
+        <a href="https://hanja.chatgpts.kr" target="_blank" rel="noopener">📖 한자야 놀자</a>
+        <a href="https://voca.chatgpts.kr" target="_blank" rel="noopener">⚡ 단어야 놀자</a>
+        <a href="https://history.chatgpts.kr" target="_blank" rel="noopener">📜 역사야 놀자</a>
+        <a href="https://fortune.chatgpts.kr" target="_blank" rel="noopener">🔮 운세야 놀자</a>
+        <a href="https://mind.chatgpts.kr" target="_blank" rel="noopener">🧠 마인드테스트</a>
+        <a href="https://work.chatgpts.kr" target="_blank" rel="noopener">💼 워크야 놀자</a>
+        <a href="https://money.chatgpts.kr" target="_blank" rel="noopener">💰 머니야 놀자</a>
+        <a href="https://tools.chatgpts.kr" target="_blank" rel="noopener">🛠️ 문서야 놀자</a>
+        <a href="https://bible.chatgpts.kr" target="_blank" rel="noopener">✝️ 성경아 놀자</a>
+        <a href="https://maum.chatgpts.kr" target="_blank" rel="noopener">🪷 마음아 놀자</a>
+        <a href="https://chatgpts.kr" target="_blank" rel="noopener">🏠 chatgpts.kr</a>
+    </div>
+    <p>© 2026 독서야 놀자! (book.chatgpts.kr)</p>
+  </footer>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/supabase-config.js"></script>
+<script defer src="js/cg-auth.js" data-service="book" data-mount=".header-right" data-mount-mode="append" data-my-page="records.html" data-hint="로그인하면 내 독서기록이 계정에 저장돼요."></script>
+<script defer src="js/book-data.js"></script>
+<script defer src="js/prompts.js"></script>
+<script defer src="js/book-sync.js"></script>
+<script defer src="js/nav.js"></script>
+<script defer src="js/write.js"></script>
+<script defer src="js/track.js" data-service="book"></script>
 </body>
 </html>

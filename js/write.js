@@ -1,292 +1,252 @@
-// book/js/write.js
+/* ============================================================
+   독서야 놀자 (book) - 기록 작성/수정 (write.js)
+   - 로그인 필요 (비로그인은 Google 로그인 안내만)
+   - 입력값 trim + 필수(제목) 검증 + 별점 1~5 검증
+   - 임시저장(localStorage 초안) 지원
+   - XSS 방지: 출력 화면(view)에서 escape 처리 (이 파일은 저장만 담당)
+   의존성: BookData · BookPrompts · BookSync · CGAuth
+   ============================================================ */
+(function () {
+  'use strict';
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  var form, gate, editTitle;
+  var isEdit = false;
+  var editId = null;
 
-const SUPABASE_URL = 'https://ybhiznlelnpwaicyoifa.supabase.co'; // Replace with your Supabase URL
-const SUPABASE_ANON_KEY = 'sb_publishable_H4gFRiLEjE8h8s_EX4tKzg__ZKpsBR1'; // Replace with your Supabase Anon Key
+  // ---------- 필드 → valueSetter/getter 매핑 ----------
+  var FIELD_PICKERS = {
+    title: '#title', author: '#author', publisher: '#publisher', isbn: '#isbn',
+    category: '#category', reading_status: '#reading-status',
+    started_at: '#started-at', finished_at: '#finished-at', reading_date: '#reading-date',
+    one_line_review: '#one-line-review', summary: '#summary',
+    memorable_sentence: '#memorable-sentence', feeling: '#feeling', learned: '#learned',
+    action_plan: '#action-plan', favorite_character: '#favorite-character',
+    question_after_reading: '#question-after-reading', visibility: '#visibility'
+  };
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: 'book' } });
+  function field(name, el) {
+    return el || document.querySelector(FIELD_PICKERS[name]);
+  }
+  function val(name, v) {
+    var el = field(name);
+    if (v === undefined) return el ? el.value : '';
+    if (el) el.value = v === null || v === undefined ? '' : v;
+  }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const authRequired = document.getElementById('auth-required');
-    const writeContent = document.getElementById('write-content');
-    const recordForm = document.getElementById('record-form');
-    const recordIdField = document.getElementById('record-id');
-    const pageTitle = document.getElementById('page-title');
+  // ---------- 옵션/질문 채우기 ----------
+  function fillOptions() {
+    var statusSel = field('reading_status');
+    BookData.statuses.forEach(function (s) {
+      var o = document.createElement('option');
+      o.value = s.value; o.textContent = s.label + ' ' + s.emoji;
+      statusSel.appendChild(o);
+    });
+    var catSel = field('category');
+    BookData.categories.forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      catSel.appendChild(o);
+    });
+    var starRow = document.getElementById('rating-row');
+    BookData.ratings.forEach(function (r) {
+      var lab = document.createElement('label');
+      var inp = document.createElement('input');
+      inp.type = 'radio'; inp.name = 'rating'; inp.value = String(r.value);
+      lab.appendChild(inp); lab.appendChild(document.createTextNode(r.label));
+      starRow.appendChild(lab);
+    });
+    // "없음" 기본
+    var none = document.createElement('label');
+    var noneInp = document.createElement('input');
+    noneInp.type = 'radio'; noneInp.name = 'rating'; noneInp.value = '';
+    noneInp.checked = true;
+    none.appendChild(noneInp); none.appendChild(document.createTextNode('없음'));
+    starRow.appendChild(none);
+  }
 
-    // Input fields
-    const titleInput = document.getElementById('title');
-    const authorInput = document.getElementById('author');
-    const publisherInput = document.getElementById('publisher');
-    const isbnInput = document.getElementById('isbn');
-    const categorySelect = document.getElementById('category');
-    const statusSelect = document.getElementById('reading-status');
-    const startedAtInput = document.getElementById('started-at');
-    const finishedAtInput = document.getElementById('finished-at');
-    const readingDateInput = document.getElementById('reading-date');
-    const oneLineReviewInput = document.getElementById('one-line-review');
-    const summaryTextarea = document.getElementById('summary');
-    const memorableSentenceTextarea = document.getElementById('memorable-sentence');
-    const feelingTextarea = document.getElementById('feeling');
-    const learnedTextarea = document.getElementById('learned');
-    const actionPlanTextarea = document.getElementById('action-plan');
-    const favoriteCharacterInput = document.getElementById('favorite-character');
-    const questionAfterReadingTextarea = document.getElementById('question-after-reading');
-    const visibilitySelect = document.getElementById('visibility');
-    const ratingRadios = document.querySelectorAll('input[name="rating"]');
-    const cancelBtn = document.getElementById('cancel-btn');
-    const tempSaveBtn = document.getElementById('temp-save-btn');
-
-    let currentUser = null;
-    const recordId = new URLSearchParams(window.location.search).get('id');
-
-    // Populate categories and statuses
-    if (window.BookData) {
-        BookData.categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            categorySelect.appendChild(option);
+  function fillPrompts() {
+    // 필드별 매핑 (질문 클릭 시 해당 textarea 에 텍스트 추가)
+    var map = [
+      ['one_line_review', '#one-line-review'],
+      ['summary', '#summary'],
+      ['memorable_sentence', '#memorable-sentence'],
+      ['feeling', '#feeling'],
+      ['learned', '#learned'],
+      ['action_plan', '#action-plan'],
+      ['favorite_character', '#favorite-character'],
+      ['question_after_reading', '#question-after-reading']
+    ];
+    map.forEach(function (pair) {
+      var key = pair[0], sel = pair[1];
+      var ul = document.getElementById('prompt-' + key);
+      var ta = document.querySelector(sel);
+      if (!ul || !ta) return;
+      (BookPrompts.fields[key] || []).forEach(function (q) {
+        var li = document.createElement('li');
+        li.textContent = q;
+        li.addEventListener('click', function () {
+          ta.value += (ta.value ? '\n\n' : '') + q;
+          ta.focus();
         });
+        ul.appendChild(li);
+      });
+    });
 
-        BookData.statuses.forEach(status => {
-            const option = document.createElement('option');
-            option.value = status.value;
-            option.textContent = status.label;
-            statusSelect.appendChild(option);
+    // 독후감 템플릿 → 요약(summary) 영역에서 쓰도록 버튼
+    var tpl = document.getElementById('templates');
+    if (tpl) {
+      (BookPrompts.templates || []).forEach(function (line) {
+        var li = document.createElement('li');
+        li.textContent = line;
+        li.addEventListener('click', function () {
+          var ta = document.querySelector('#summary');
+          ta.value += (ta.value ? '\n' : '') + line;
+          ta.focus();
         });
+        tpl.appendChild(li);
+      });
+    }
+  }
+
+  // ---------- 데이터 조립 ----------
+  function readPayload() {
+    var star = document.querySelector('input[name="rating"]:checked');
+    var rating = star ? star.value : '';
+    var blank = function (s) { return s.trim() === '' ? null : s.trim(); };
+    var dateBlank = function (s) { return s ? s : null; };
+    return {
+      title: blank(val('title')),
+      author: blank(val('author')),
+      publisher: blank(val('publisher')),
+      isbn: blank(val('isbn')),
+      category: blank(val('category')),
+      reading_status: val('reading_status') || 'done',
+      started_at: dateBlank(val('started_at')),
+      finished_at: dateBlank(val('finished_at')),
+      reading_date: dateBlank(val('reading_date')),
+      rating: rating === '' ? null : Math.min(5, Math.max(1, parseInt(rating, 10) || 0)) || null,
+      one_line_review: blank(val('one_line_review')),
+      summary: blank(val('summary')),
+      memorable_sentence: blank(val('memorable_sentence')),
+      feeling: blank(val('feeling')),
+      learned: blank(val('learned')),
+      action_plan: blank(val('action_plan')),
+      favorite_character: blank(val('favorite_character')),
+      question_after_reading: blank(val('question_after_reading')),
+      visibility: val('visibility') || 'private'
+    };
+  }
+
+  function applyPayload(p) {
+    val('title', p.title); val('author', p.author); val('publisher', p.publisher);
+    val('isbn', p.isbn); val('category', p.category); val('reading_status', p.reading_status);
+    val('started_at', p.started_at); val('finished_at', p.finished_at); val('reading_date', p.reading_date);
+    val('one_line_review', p.one_line_review); val('summary', p.summary);
+    val('memorable_sentence', p.memorable_sentence); val('feeling', p.feeling);
+    val('learned', p.learned); val('action_plan', p.action_plan);
+    val('favorite_character', p.favorite_character); val('question_after_reading', p.question_after_reading);
+    val('visibility', p.visibility || 'private');
+    if (p.rating) {
+      var inp = document.querySelector('input[name="rating"][value="' + p.rating + '"]');
+      if (inp) inp.checked = true;
+    }
+  }
+
+  // ---------- 폼 저장 ----------
+  async function onSubmit(e) {
+    e.preventDefault();
+    if (!BookSync.isLoggedIn()) { alert('로그인 후 기록을 저장할 수 있어요.'); return; }
+
+    var payload = readPayload();
+    if (!payload.title) { alert('책 제목은 꼭 적어주세요.'); field('title').focus(); return; }
+
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    var res;
+    if (isEdit) res = await BookSync.update(editId, payload);
+    else res = await BookSync.create(payload);
+
+    btn.disabled = false;
+    if (res.error) {
+      alert('저장에 실패했어요: ' + ((res.error && res.error.message) || '알 수 없는 오류'));
+      return;
+    }
+    BookSync.clearDraft();
+    window.location.href = 'view.html?id=' + (isEdit ? editId : res.data.id);
+  }
+
+  function onTempSave() {
+    var payload = readPayload();
+    if (!payload.title) { alert('책 제목을 적어야 임시 저장할 수 있어요.'); return; }
+    BookSync.saveDraft(payload);
+    alert('이 화면에서 내용을 임시 저장했어요. 브라우저를 닫아도 이어서 쓸 수 있어요.');
+  }
+
+  function restoreDraft() {
+    if (isEdit) return;
+    var d = BookSync.loadDraft();
+    if (!d) return;
+    if (!confirm('이전에 임시 저장한 내용이 있어요. 이어서 작성할까요?')) { BookSync.clearDraft(); return; }
+    applyPayload(d);
+    BookSync.clearDraft();
+  }
+
+  // ---------- 수정 모드 로딩 ----------
+  var href = new URLSearchParams(window.location.search).get('id');
+  async function loadForEdit() {
+    isEdit = true; editId = href;
+    if (editTitle) editTitle.textContent = '독서기록 수정';
+    document.title = '독서기록 수정 - 독서야 놀자!';
+    var res = await BookSync.get(editId);
+    if (res.error && res.error.code === 'PGRST116') { alert('기록을 찾을 수 없거나 권한이 없어요.'); location.href = 'records.html'; return; }
+    if (!res.data) { alert('기록을 불러오지 못했어요.'); location.href = 'records.html'; return; }
+    if (res.data.user_id !== BookSync.uid()) { alert('이 기록을 수정할 권한이 없어요.'); location.href = 'records.html'; return; }
+    applyPayload(res.data);
+  }
+
+  // ---------- 로그인 게이트 ----------
+  var inited = false;
+  function applyAuth(loggedIn) {
+    if (!form) return;
+    form.style.display = loggedIn ? '' : 'none';
+    gate.style.display = loggedIn ? 'none' : '';
+  }
+
+  async function start() {
+    form = document.getElementById('record-form');
+    gate = document.getElementById('auth-required');
+    editTitle = document.getElementById('page-title');
+    if (!form) return;
+
+    fillOptions();
+    fillPrompts();
+    form.addEventListener('submit', onSubmit);
+    var tempBtn = document.getElementById('temp-save-btn');
+    if (tempBtn) tempBtn.addEventListener('click', onTempSave);
+    var cancelBtn = document.getElementById('cancel-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function () {
+        if (confirm('작성을 취소하고 돌아갈까요? 임시 저장한 내용은 남아 있어요.')) {
+          location.href = isEdit ? 'view.html?id=' + editId : 'records.html';
+        }
+      });
     }
 
-    // Populate prompts
-    if (window.BookPrompts) {
-        const promptFields = [
-            { id: 'summary-prompts', prompts: BookPrompts.summary },
-            { id: 'memorable-sentence-prompts', prompts: BookPrompts.memorable_sentence },
-            { id: 'feeling-prompts', prompts: BookPrompts.feeling },
-            { id: 'learned-prompts', prompts: BookPrompts.learned },
-            { id: 'action-plan-prompts', prompts: BookPrompts.action_plan },
-            { id: 'favorite-character-prompts', prompts: BookPrompts.favorite_character },
-            { id: 'question-prompts', prompts: BookPrompts.question_after_reading },
-        ];
-
-        promptFields.forEach(field => {
-            const ul = document.getElementById(field.id);
-            if (ul && field.prompts) {
-                field.prompts.forEach(p => {
-                    const li = document.createElement('li');
-                    li.textContent = p;
-                    li.addEventListener('click', () => {
-                        const targetTextarea = ul.previousElementSibling; // Assuming textarea is right before ul
-                        if (targetTextarea && targetTextarea.tagName === 'TEXTAREA') {
-                            targetTextarea.value += (targetTextarea.value ? '
-
-' : '') + p;
-                        }
-                    });
-                    ul.appendChild(li);
-                });
-            }
-        });
+    await BookSync.ready();
+    applyAuth(BookSync.isLoggedIn());
+    if (BookSync.isLoggedIn()) {
+      BookSync.ensureMembership();
+      if (href) { await loadForEdit(); }
+      else { restoreDraft(); }
     }
-
-    CGAuth.onChange(async ({ user, isLoggedIn }) => {
-        if (isLoggedIn) {
-            currentUser = user;
-            authRequired.style.display = 'none';
-            writeContent.style.display = 'block';
-            if (recordId) {
-                pageTitle.textContent = '독서기록 수정';
-                loadRecordForEdit(recordId);
-            }
-        } else {
-            currentUser = null;
-            authRequired.style.display = 'block';
-            writeContent.style.display = 'none';
-        }
+    BookSync.onChange(function (s) {
+      applyAuth(s.isLoggedIn);
+      if (s.isLoggedIn && !inited && href) loadForEdit();
+      if (s.isLoggedIn) BookSync.ensureMembership();
     });
+  }
 
-    // Initial check in case CGAuth is already resolved
-    CGAuth.ready().then(async () => {
-        if (CGAuth.isLoggedIn()) {
-            currentUser = CGAuth.getUser();
-            authRequired.style.display = 'none';
-            writeContent.style.display = 'block';
-            if (recordId) {
-                pageTitle.textContent = '독서기록 수정';
-                loadRecordForEdit(recordId);
-            }
-        } else {
-            currentUser = null;
-            authRequired.style.display = 'block';
-            writeContent.style.display = 'none';
-        }
-    });
-
-    async function loadRecordForEdit(id) {
-        const { data, error } = await supabase.from('records').select('*').eq('id', id).single();
-        if (error || !data) {
-            console.error('Error loading record for edit:', error);
-            alert('기록을 불러오는 데 실패했습니다.');
-            window.location.href = 'records.html';
-            return;
-        }
-
-        if (data.user_id !== currentUser.id) {
-            alert('이 기록을 수정할 권한이 없습니다.');
-            window.location.href = 'records.html';
-            return;
-        }
-
-        recordIdField.value = data.id;
-        titleInput.value = data.title;
-        authorInput.value = data.author;
-        publisherInput.value = data.publisher;
-        isbnInput.value = data.isbn;
-        categorySelect.value = data.category;
-        statusSelect.value = data.reading_status;
-        startedAtInput.value = data.started_at;
-        finishedAtInput.value = data.finished_at;
-        readingDateInput.value = data.reading_date;
-        oneLineReviewInput.value = data.one_line_review;
-        summaryTextarea.value = data.summary;
-        memorableSentenceTextarea.value = data.memorable_sentence;
-        feelingTextarea.value = data.feeling;
-        learnedTextarea.value = data.learned;
-        actionPlanTextarea.value = data.action_plan;
-        favoriteCharacterInput.value = data.favorite_character;
-        questionAfterReadingTextarea.value = data.question_after_reading;
-        visibilitySelect.value = data.visibility;
-
-        if (data.rating) {
-            document.getElementById(`rating-${data.rating}`).checked = true;
-        } else {
-            document.getElementById(`rating-0`).checked = true;
-        }
-    }
-
-    recordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-            alert('로그인 후 이용해주세요.');
-            return;
-        }
-
-        // Basic validation
-        if (!titleInput.value.trim()) {
-            alert('책 제목은 필수입니다.');
-            return;
-        }
-
-        const selectedRating = document.querySelector('input[name="rating"]:checked').value;
-
-        const recordData = {
-            user_id: currentUser.id,
-            title: titleInput.value.trim(),
-            author: authorInput.value.trim() || null,
-            publisher: publisherInput.value.trim() || null,
-            isbn: isbnInput.value.trim() || null,
-            category: categorySelect.value || null,
-            reading_status: statusSelect.value,
-            started_at: startedAtInput.value || null,
-            finished_at: finishedAtInput.value || null,
-            reading_date: readingDateInput.value || null,
-            rating: selectedRating ? parseInt(selectedRating, 10) : null,
-            one_line_review: oneLineReviewInput.value.trim() || null,
-            summary: summaryTextarea.value.trim() || null,
-            memorable_sentence: memorableSentenceTextarea.value.trim() || null,
-            feeling: feelingTextarea.value.trim() || null,
-            learned: learnedTextarea.value.trim() || null,
-            action_plan: actionPlanTextarea.value.trim() || null,
-            favorite_character: favoriteCharacterInput.value.trim() || null,
-            question_after_reading: questionAfterReadingTextarea.value.trim() || null,
-            visibility: visibilitySelect.value,
-        };
-
-        let result;
-        if (recordId) {
-            // Update existing record
-            result = await supabase.from('records').update(recordData).eq('id', recordId).eq('user_id', currentUser.id);
-        } else {
-            // Insert new record
-            result = await supabase.from('records').insert([recordData]);
-        }
-
-        if (result.error) {
-            console.error('Error saving record:', result.error);
-            alert('기록 저장에 실패했습니다: ' + result.error.message);
-        } else {
-            alert('기록이 성공적으로 저장되었습니다!');
-            // Redirect to view or records page
-            window.location.href = recordId ? `view.html?id=${recordId}` : 'records.html';
-        }
-    });
-
-    tempSaveBtn.addEventListener('click', () => {
-        const currentRecord = {
-            title: titleInput.value,
-            author: authorInput.value,
-            publisher: publisherInput.value,
-            isbn: isbnInput.value,
-            category: categorySelect.value,
-            reading_status: statusSelect.value,
-            started_at: startedAtInput.value,
-            finished_at: finishedAtInput.value,
-            reading_date: readingDateInput.value,
-            rating: document.querySelector('input[name="rating"]:checked').value,
-            one_line_review: oneLineReviewInput.value,
-            summary: summaryTextarea.value,
-            memorable_sentence: memorableSentenceTextarea.value,
-            feeling: feelingTextarea.value,
-            learned: learnedTextarea.value,
-            action_plan: actionPlanTextarea.value,
-            favorite_character: favoriteCharacterInput.value,
-            question_after_reading: questionAfterReadingTextarea.value,
-            visibility: visibilitySelect.value,
-            // Do not store user_id or id for temporary local storage
-        };
-        localStorage.setItem('book_temp_record', JSON.stringify(currentRecord));
-        alert('현재 내용이 임시 저장되었습니다.');
-    });
-
-    cancelBtn.addEventListener('click', () => {
-        if (confirm('작성을 취소하고 목록으로 돌아가시겠습니까? 저장되지 않은 내용은 사라집니다.')) {
-            localStorage.removeItem('book_temp_record'); // Clear temporary save on cancel
-            window.location.href = 'records.html';
-        }
-    });
-
-    // Load temporary saved data if any, only for new records
-    if (!recordId) {
-        const tempRecord = localStorage.getItem('book_temp_record');
-        if (tempRecord) {
-            if (confirm('임시 저장된 내용이 있습니다. 이어서 작성하시겠습니까?')) {
-                const data = JSON.parse(tempRecord);
-                titleInput.value = data.title || '';
-                authorInput.value = data.author || '';
-                publisherInput.value = data.publisher || '';
-                isbnInput.value = data.isbn || '';
-                categorySelect.value = data.category || '';
-                statusSelect.value = data.reading_status || 'done';
-                startedAtInput.value = data.started_at || '';
-                finishedAtInput.value = data.finished_at || '';
-                readingDateInput.value = data.reading_date || '';
-                oneLineReviewInput.value = data.one_line_review || '';
-                summaryTextarea.value = data.summary || '';
-                memorableSentenceTextarea.value = data.memorable_sentence || '';
-                feelingTextarea.value = data.feeling || '';
-                learnedTextarea.value = data.learned || '';
-                actionPlanTextarea.value = data.action_plan || '';
-                favoriteCharacterInput.value = data.favorite_character || '';
-                questionAfterReadingTextarea.value = data.question_after_reading || '';
-                visibilitySelect.value = data.visibility || 'private';
-                if (data.rating) {
-                    document.getElementById(`rating-${data.rating}`).checked = true;
-                } else {
-                    document.getElementById(`rating-0`).checked = true;
-                }
-            }
-            // Clear temp storage after loading or declining
-            localStorage.removeItem('book_temp_record');
-        }
-    }
-});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+})();

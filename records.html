@@ -1,79 +1,107 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 독서기록 - 독서야 놀자!</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/cg-auth.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 독서기록 - 독서야 놀자!</title>
+<meta name="description" content="내가 읽은 책 기록을 상태별로 모아 보세요.">
+<link rel="canonical" href="https://book.chatgpts.kr/records.html">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/cg-auth.css">
+<meta name="robots" content="noindex, nofollow">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">📚 독서야 놀자!</div>
-            <nav id="main-nav"></nav>
-            <div id="cg-auth-slot"></div>
-        </div>
-    </header>
+<div class="wrap">
 
-    <main>
-        <section class="container">
-            <h1>내 독서기록</h1>
-            <div id="auth-required" style="display: none;">
-                <p>이 페이지는 로그인해야 이용할 수 있습니다. <button class="btn btn-primary" data-cg="login">Google로 로그인</button></p>
-            </div>
-            <div id="records-content" style="display: none;">
-                <div class="controls">
-                    <div class="filter-group">
-                        <label for="status-filter">상태:</label>
-                        <select id="status-filter">
-                            <option value="all">전체</option>
-                            <option value="want">읽고 싶은 책</option>
-                            <option value="reading">읽는 중</option>
-                            <option value="done">다 읽음</option>
-                            <option value="paused">잠시 멈춤</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="visibility-filter">공개 여부:</label>
-                        <select id="visibility-filter">
-                            <option value="all">전체</option>
-                            <option value="private">비공개</option>
-                            <option value="public">공개</option>
-                        </select>
-                    </div>
-                    <div class="search-group">
-                        <input type="text" id="search-input" placeholder="제목, 저자, 한 줄 리뷰 검색">
-                        <button id="search-button" class="btn btn-secondary">검색</button>
-                    </div>
-                    <div class="sort-group">
-                        <label for="sort-by">정렬:</label>
-                        <select id="sort-by">
-                            <option value="created_at_desc">최신순</option>
-                            <option value="reading_date_desc">읽은 날짜순</option>
-                            <option value="rating_desc">별점순</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="record-list-grid">
-                    <!-- Records will be loaded here by records.js -->
-                    <p id="no-records" style="display: none;">아직 기록이 없습니다. 새로운 기록을 추가해보세요!</p>
-                </div>
-                <a href="write.html" class="btn btn-primary add-record-btn">새 기록 쓰기</a>
-            </div>
-        </section>
-    </main>
+  <header class="site-head">
+    <a href="index.html" class="brand-logo">
+      <span class="logo-char">📚</span>
+      <span>독서야 <span class="dot">놀자</span></span>
+    </a>
+    <div class="header-right"></div>
+  </header>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 독서야 놀자!</p>
-        </div>
-    </footer>
+  <nav class="nav-scroll" id="book-nav" aria-label="주요 메뉴"></nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="js/nav.js"></script>
-    <script defer src="js/cg-auth.js" data-service="book" data-mount="#cg-auth-slot"></script>
-    <script defer src="js/book-data.js"></script>
-    <script defer src="js/records.js"></script>
+  <div class="page-eyebrow">MY BOOKS</div>
+  <h1 class="page-title">내 독서기록</h1>
+  <p class="page-desc">이 책과 <span id="record-count"></span></p>
+
+  <!-- ===== 로그인 안내 ===== -->
+  <div id="auth-required" class="card" style="display:none;text-align:center;padding:40px 20px;">
+    <div style="font-size:44px;margin-bottom:12px;">📂</div>
+    <h2 style="margin:0 0 8px;">내 기록을 보려면 로그인해 주세요</h2>
+    <p style="color:var(--ink-soft);margin:0 0 20px;">로그인하면 내가 쓴 독서기록이 계정에 저장돼요.</p>
+    <button type="button" class="btn btn-primary" data-cg="login">Google로 로그인</button>
+  </div>
+
+  <!-- ===== 목록 ===== -->
+  <div class="records-area" style="display:none;">
+    <div class="toolbar">
+      <div class="filter-chips" id="status-chips">
+        <button class="filter-chip active" data-status="all">🗂️ 전체</button>
+        <button class="filter-chip" data-status="want">📌 읽고 싶은 책</button>
+        <button class="filter-chip" data-status="reading">📖 읽는 중</button>
+        <button class="filter-chip" data-status="done">✅ 다 읽음</button>
+        <button class="filter-chip" data-status="paused">⏸️ 잠시 멈춤</button>
+      </div>
+    </div>
+    <div class="toolbar" style="margin-top:0;">
+      <select id="visibility-filter" aria-label="공개 여부">
+        <option value="all">공개 여부 (전체)</option>
+        <option value="public">🌍 공개</option>
+        <option value="private">🔒 비공개</option>
+      </select>
+      <select id="sort-by" aria-label="정렬">
+        <option value="created_at_desc">최신순</option>
+        <option value="reading_date_desc">읽은 날짜순</option>
+        <option value="rating_desc">별점 높은순</option>
+        <option value="rating_asc">별점 낮은순</option>
+        <option value="title_asc">제목순</option>
+      </select>
+      <input type="text" id="search-input" placeholder="제목 · 저자 · 한 줄 느낌 검색">
+      <button class="btn btn-sm btn-outline" id="search-btn">검색</button>
+      <span style="flex:1 1 auto"></span>
+      <a href="write.html" class="btn btn-sm btn-accent" id="add-record-btn">✍️ 새 기록 쓰기</a>
+    </div>
+
+    <div id="empty-state" class="empty card" style="display:none;margin-top:10px;">
+      조건에 맞는 기록이 없어요.<br>
+      <a class="btn btn-primary btn-sm" href="write.html" style="margin-top:12px;" id="empty-add">첫 기록 쓰러 가기</a>
+    </div>
+
+    <div class="record-grid" id="record-grid" style="margin-top:10px;"></div>
+  </div>
+
+  <footer class="site-foot">
+    <div class="foot-links">
+        <a href="https://hanja.chatgpts.kr" target="_blank" rel="noopener">📖 한자야 놀자</a>
+        <a href="https://voca.chatgpts.kr" target="_blank" rel="noopener">⚡ 단어야 놀자</a>
+        <a href="https://history.chatgpts.kr" target="_blank" rel="noopener">📜 역사야 놀자</a>
+        <a href="https://fortune.chatgpts.kr" target="_blank" rel="noopener">🔮 운세야 놀자</a>
+        <a href="https://mind.chatgpts.kr" target="_blank" rel="noopener">🧠 마인드테스트</a>
+        <a href="https://work.chatgpts.kr" target="_blank" rel="noopener">💼 워크야 놀자</a>
+        <a href="https://money.chatgpts.kr" target="_blank" rel="noopener">💰 머니야 놀자</a>
+        <a href="https://tools.chatgpts.kr" target="_blank" rel="noopener">🛠️ 문서야 놀자</a>
+        <a href="https://bible.chatgpts.kr" target="_blank" rel="noopener">✝️ 성경아 놀자</a>
+        <a href="https://maum.chatgpts.kr" target="_blank" rel="noopener">🪷 마음아 놀자</a>
+        <a href="https://chatgpts.kr" target="_blank" rel="noopener">🏠 chatgpts.kr</a>
+    </div>
+    <p>© 2026 독서야 놀자! (book.chatgpts.kr)</p>
+  </footer>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/supabase-config.js"></script>
+<script defer src="js/cg-auth.js" data-service="book" data-mount=".header-right" data-mount-mode="append" data-my-page="records.html" data-hint="로그인하면 내 독서기록이 계정에 저장돼요."></script>
+<script defer src="js/book-data.js"></script>
+<script defer src="js/book-sync.js"></script>
+<script defer src="js/nav.js"></script>
+<script defer src="js/records.js"></script>
+<script defer src="js/track.js" data-service="book"></script>
 </body>
 </html>

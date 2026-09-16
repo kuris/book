@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 센터 - 독서야 놀자</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body" data-service="book">
+
+<!-- ================= 1. 로딩 화면 ================= -->
+<div class="admin-loading-wrap" id="admin-loading">
+  <div class="admin-spinner"></div>
+  <p>관리자 보안 인증 확인 중...</p>
+</div>
+
+<!-- ================= 2. 관리자 로그인 화면 ================= -->
+<div class="admin-auth-container" id="admin-auth-view" style="display:none;">
+  <div class="admin-auth-card">
+    <div class="admin-auth-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    <h2>관리자 센터 로그인</h2>
+    <p>독서야 놀자 시스템 관리자 전용 화면입니다.<br>등록된 관리자 계정으로 로그인해 주세요.</p>
+
+    <button type="button" class="admin-btn-google" id="admin-google-btn">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.2C12.4 13.6 17.7 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.2 5.6c4.2-3.9 6.6-9.6 6.6-17z"/>
+        <path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.2C1 16.3 0 20 0 24s1 7.7 2.6 10.8l7.9-6.2z"/>
+        <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2 1.4-4.6 2.2-8.7 2.2-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.2C6.5 42.6 14.6 48 24 48z"/>
+      </svg>
+      Google 계정으로 관리자 로그인
+    </button>
+
+
+    <!-- 이메일/비밀번호 로그인 폼은 제거했습니다.
+         관리자도 위의 Google 로그인만 사용합니다. -->
+
+<div id="admin-auth-msg" class="admin-msg" style="margin-top:16px;"></div>
+
+    <div style="margin-top:20px;">
+      <a href="index.html" class="admin-btn-outline"><i class="fa-solid fa-arrow-left"></i> 서비스 홈으로 돌아가기</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 3. 접근 권한 없음 화면 ================= -->
+<div class="admin-auth-container" id="admin-denied-view" style="display:none;">
+  <div class="admin-auth-card">
+    <div class="admin-auth-icon" style="background:#fee2e2;color:#dc2626;"><i class="fa-solid fa-lock"></i></div>
+    <h2>접근 권한이 없습니다</h2>
+    <p>현재 로그인된 계정(<strong id="denied-user-email"></strong>)은 관리자 권한이 없습니다.<br>
+      이 페이지는 등록된 관리자 계정 전용입니다.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button type="button" class="admin-btn-submit js-admin-logout" style="background:#475569;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> 다른 계정으로 로그인 (로그아웃)
+      </button>
+      <a href="index.html" class="admin-btn-outline"><i class="fa-solid fa-house"></i> 홈으로 이동</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 4. 관리자 대시보드 ================= -->
+<div id="admin-dashboard-view" style="display:none;">
+
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="admin-brand">
+        <span class="admin-logo-badge">📚</span>
+        <div class="admin-title-wrap">
+          <h1>독서야 놀자 <span class="admin-title-tag">ADMIN</span></h1>
+        </div>
+      </div>
+
+      <div class="admin-header-actions">
+        <span class="admin-user-pill">
+          <i class="fa-solid fa-crown"></i>
+          <span id="admin-current-email">—</span>
+        </span>
+
+        <div class="admin-switch" id="admin-switch">
+          <button type="button" class="admin-switch-btn" id="admin-switch-btn">
+            <i class="fa-solid fa-repeat"></i> 서비스 전환 <i class="fa-solid fa-chevron-down" style="font-size:.75rem;"></i>
+          </button>
+          <div class="admin-switch-menu" id="admin-switch-menu"></div>
+        </div>
+
+        <button class="admin-btn-outline" id="admin-refresh-btn"><i class="fa-solid fa-rotate"></i> 새로고침</button>
+        <a href="index.html" class="admin-btn-outline" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 사이트 보기</a>
+        <button class="admin-btn-outline js-admin-logout" style="color:#b91c1c;border-color:#fca5a5;"><i class="fa-solid fa-right-from-bracket"></i> 로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="admin-tabs-nav">
+    <div class="admin-tabs-inner">
+      <button class="admin-tab-btn active" data-tab="traffic"><i class="fa-solid fa-chart-line"></i> 화면 조회수 &amp; 접속 시간대</button>
+      <button class="admin-tab-btn" data-tab="records"><i class="fa-solid fa-book-open"></i> 독서기록 관리</button>
+      <button class="admin-tab-btn" data-tab="members"><i class="fa-solid fa-users"></i> 회원 및 접속 현황</button>
+      <button class="admin-tab-btn" data-tab="screens"><i class="fa-solid fa-table-list"></i> 화면별 상세 통계</button>
+      <button class="admin-tab-btn" data-tab="content"><i class="fa-solid fa-book-open"></i> 콘텐츠 현황 &amp; 검색기</button>
+      <button class="admin-tab-btn" data-tab="system"><i class="fa-solid fa-database"></i> 시스템 &amp; SQL 가이드</button>
+    </div>
+  </nav>
+
+  <main class="admin-content">
+
+    <!-- ========== 탭 1 ========== -->
+    <div class="admin-tab-panel" id="panel-traffic">
+      <div class="admin-filter-box">
+        <div class="admin-filter-row">
+          <div class="admin-filter-group">
+            <span class="admin-filter-label"><i class="fa-solid fa-calendar-check" style="color:#0284c7;"></i> 기간 단위:</span>
+            <div class="admin-filter-pills" id="admin-period-filter">
+              <button class="admin-pill-btn active" data-period="all">전체 누적</button>
+              <button class="admin-pill-btn" data-period="month">최근 30일 (월간)</button>
+              <button class="admin-pill-btn" data-period="week">최근 7일 (주간)</button>
+              <button class="admin-pill-btn" data-period="today">오늘</button>
+            </div>
+          </div>
+          <div class="admin-filter-group">
+            <span class="admin-filter-label"><i class="fa-solid fa-clock" style="color:#dc2626;"></i> 시간대 구분:</span>
+            <div class="admin-filter-pills" id="admin-time-slot-filter">
+              <button class="admin-pill-btn active" data-slot="all">전체 (00~23시)</button>
+              <button class="admin-pill-btn" data-slot="morning">아침 (06~12시)</button>
+              <button class="admin-pill-btn" data-slot="afternoon">오후 (12~18시)</button>
+              <button class="admin-pill-btn" data-slot="evening">저녁/밤 (18~24시)</button>
+              <button class="admin-pill-btn" data-slot="night">새벽 (00~06시)</button>
+            </div>
+          </div>
+        </div>
+        <div class="admin-filter-summary">
+          <i class="fa-solid fa-circle-info" style="color:#0284c7;"></i>
+          <span id="admin-filter-summary">전체 기간 누적 및 전 시간대 통계를 표시 중입니다.</span>
+        </div>
+      </div>
+
+      <div class="admin-stat-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>총 누적 페이지뷰</span>
+            <span class="admin-stat-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-eye"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-total-pv">0회</div>
+          <div class="admin-stat-sub">전체 화면 누적 집계</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>오늘 페이지뷰</span>
+            <span class="admin-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-calendar-day"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-today-pv">0회</div>
+          <div class="admin-stat-sub">당일 접속 트래픽 (KST)</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>최근 7일 / 30일</span>
+            <span class="admin-stat-icon" style="background:#ede9fe;color:#2563eb;"><i class="fa-solid fa-calendar-week"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-week-pv" style="font-size:1.4rem;">0회 / 0회</div>
+          <div class="admin-stat-sub">주간 / 월간 누적</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>최다 접속 시간대</span>
+            <span class="admin-stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="fa-solid fa-clock"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-peak-hour" style="font-size:1.4rem;">—</div>
+          <div class="admin-stat-sub">24시간 중 피크 시간</div>
+        </div>
+      </div>
+
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-chart-column" style="color:#0284c7;"></i> 24시간 접속 시간대 분포 (00시 ~ 23시 KST)</h3>
+          <span class="admin-panel-note">막대를 클릭하면 해당 시간대만 정밀 조회합니다.</span>
+        </div>
+        <div class="admin-hourly-chart" id="admin-hourly-chart"></div>
+      </div>
+
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-calendar-days" style="color:#10b981;"></i> 일자별 방문 추이 (최근 14일)</h3>
+          <span class="admin-badge admin-badge-info"><i class="fa-solid fa-database"></i> Supabase 실시간 누적</span>
+        </div>
+        <div class="admin-daily-chart" id="admin-daily-chart"></div>
+      </div>
+
+      <div class="admin-grid-2">
+        <div class="admin-panel">
+          <div class="admin-panel-head">
+            <h3 class="admin-panel-title"><i class="fa-solid fa-trophy" style="color:#eab308;"></i> 자주 보는 화면 순위</h3>
+          </div>
+          <div class="admin-page-rank-list" id="admin-page-ranking"></div>
+        </div>
+        <div class="admin-panel">
+          <div class="admin-panel-head">
+            <h3 class="admin-panel-title"><i class="fa-solid fa-bolt" style="color:#0ea5e9;"></i> 실시간 최근 방문 화면 로그</h3>
+          </div>
+          <div class="admin-feed" id="admin-recent-visits"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 탭 2 ========== -->
+    <div class="admin-tab-panel" id="panel-members" style="display:none;">
+      <div class="admin-stat-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>확인된 사용자 수</span>
+            <span class="admin-stat-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-users"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-total-users">0명</div>
+          <div class="admin-stat-sub">로그인 사용자 기준</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>오늘 접속</span>
+            <span class="admin-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-user-clock"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-active-today">0명</div>
+          <div class="admin-stat-sub">24시간 내 접속</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>최근 7일 활성</span>
+            <span class="admin-stat-icon" style="background:#fef3c7;color:#d97706;"><i class="fa-solid fa-chart-line"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-active-week">0명</div>
+          <div class="admin-stat-sub">주간 활성 유저 (WAU)</div>
+        </div>
+      </div>
+
+      <div id="admin-members-note"></div>
+
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-address-book" style="color:#2563eb;"></i> 사용자 목록 및 최근 접속 시각</h3>
+          <div class="admin-search-bar">
+            <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;"></i>
+            <input type="text" id="admin-member-search" placeholder="닉네임 / ID 검색...">
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>구분</th><th>사용자 ID</th><th>상태</th><th>역할</th><th>최초 기록</th><th>최근 접속</th></tr>
+            </thead>
+            <tbody id="admin-members-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:20px;">데이터를 불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 탭 3 ========== -->
+    <div class="admin-tab-panel" id="panel-screens" style="display:none;">
+      <div class="admin-stat-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>집계된 화면 수</span>
+            <span class="admin-stat-icon" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-table-list"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-screen-count">0개</div>
+          <div class="admin-stat-sub">현재 필터 기준</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>로그인 방문자 수</span>
+            <span class="admin-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-user-check"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-screen-users">0명</div>
+          <div class="admin-stat-sub">user_id 가 남은 방문 기준</div>
+        </div>
+      </div>
+
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-list-check" style="color:#2563eb;"></i> 화면별 조회수 · 방문자 · 최근 방문</h3>
+          <span class="admin-panel-note">탭 1의 기간/시간대 필터가 그대로 적용됩니다.</span>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>화면명</th><th>경로</th><th>조회수</th><th>로그인 방문자</th><th>최근 방문</th></tr>
+            </thead>
+            <tbody id="admin-screen-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:20px;">데이터를 불러오는 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 탭 4 ========== -->
+    <div class="admin-tab-panel" id="panel-content" style="display:none;">
+      <div class="admin-stat-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>화면 수</span>
+            <span class="admin-stat-icon" style="background:#ede9fe;color:#2563eb;"><i class="fa-solid fa-window-restore"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-content-pages">—</div>
+          <div class="admin-stat-sub">사용자용 화면</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>가장 인기 있는 웹도구</span>
+            <span class="admin-stat-icon" style="background:#fef3c7;color:#d97706;"><i class="fa-solid fa-star"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-content-top" style="font-size:1.3rem;">—</div>
+          <div class="admin-stat-sub">조회수 1위 화면</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-head">
+            <span>수집된 로그 건수</span>
+            <span class="admin-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-database"></i></span>
+          </div>
+          <div class="admin-stat-num" id="stat-content-logs">—</div>
+          <div class="admin-stat-sub">차트에 사용된 원본 행 수</div>
+        </div>
+      </div>
+
+      <div class="admin-callout">
+        <div class="admin-callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="admin-callout-body">
+          <h4>콘텐츠 수치는 화면 로그 기준입니다</h4>
+          <p>계산 로직은 사용자용 스크립트 안에 있어 관리자 화면에서 직접 셀 수 없습니다. 기존 사용자 파일을 수정하지 않기 위해, 여기서는 화면 목록과 수집된 로그를 기준으로 검색합니다.</p>
+        </div>
+      </div>
+
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-magnifying-glass-chart" style="color:#2563eb;"></i> 화면 · 로그 검색기</h3>
+        </div>
+        <p style="color:#64748b;font-size:.9rem;margin-top:0;">화면 이름이나 경로를 입력하면 해당 화면의 수집 현황을 찾아줍니다.</p>
+        <div class="admin-search-inline">
+          <input type="text" id="admin-content-query" class="admin-input" placeholder="예: 글자수 세기, text-counter...">
+          <button class="admin-btn-submit" id="admin-content-search-btn">검색</button>
+        </div>
+        <div id="admin-content-result"></div>
+      </div>
+    </div>
+
+    <!-- ========== 탭 5 ========== -->
+    <div class="admin-tab-panel" id="panel-system" style="display:none;">
+      <div class="admin-panel">
+        <div class="admin-panel-head">
+          <h3 class="admin-panel-title"><i class="fa-solid fa-server" style="color:#10b981;"></i> 시스템 및 인프라 연동 정보</h3>
+        </div>
+
+        <div class="admin-info-grid">
+          <div class="admin-info-item">
+            <div class="admin-info-key">운영 도메인</div>
+            <div class="admin-info-val">book.chatgpts.kr</div>
+          </div>
+          <div class="admin-info-item">
+            <div class="admin-info-key">Supabase 프로젝트</div>
+            <div class="admin-info-val">ybhiznlelnpwaicyoifa</div>
+          </div>
+          <div class="admin-info-item">
+            <div class="admin-info-key">기록 테이블</div>
+            <div class="admin-info-val">public.book_records</div>
+          </div>
+          <div class="admin-info-item">
+            <div class="admin-info-key">service 값</div>
+            <div class="admin-info-val" style="color:#2563eb;">book</div>
+          </div>
+        </div>
+
+        <div class="admin-callout is-warn">
+          <div class="admin-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="admin-callout-body">
+            <h4>전용 스키마 대신 public + book_records 를 사용합니다</h4>
+            <p>최신 형제 서비스(bible 등)와 동일하게 이 프로젝트는 <code>public</code> 스키마에
+              서비스 접두사 테이블(<code>public.book_records</code>)을 씁니다. 공통 로그인 모듈(cg-auth.js)의
+              기록 헬퍼가 public 을 기본으로 하므로 전용 스키마를 만들지 않아 별도 Supabase 설정이 필요 없습니다.</p>
+          </div>
+        </div>
+
+        <div class="admin-callout">
+          <div class="admin-callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <div class="admin-callout-body">
+            <h4>Supabase SQL 가이드</h4>
+            <p>Supabase 대시보드 &gt; SQL Editor 에서 <code>_shared/sql/01~06</code> 을 먼저 실행한 뒤
+              아래 <code>08-book.sql</code>(<code>book/supabase/migrations/001_book_schema.sql</code>) 을
+              실행하면 기록 테이블·RLS·권한이 생성됩니다.</p>
+          </div>
+        </div>
+
+        <div class="admin-code-box">
+          <button class="admin-copy-btn" id="admin-copy-sql">SQL 복사</button>
+          <pre id="admin-sql-code">-- 독서야 놀자 기록 테이블 (public.book_records) — 요약본. 전체는 _shared/sql/08-book.sql
+create table if not exists public.book_records (
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid not null references auth.users(id) on delete cascade,
+  title          text not null,
+  author         text, publisher text, isbn text, category text,
+  reading_status text not null default 'done',
+  started_at date, finished_at date, reading_date date,
+  rating int,
+  one_line_review text, summary text, memorable_sentence text,
+  feeling text, learned text, action_plan text,
+  favorite_character text, question_after_reading text,
+  visibility text not null default 'private',        -- private | public
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz                               -- soft delete
+);
+alter table public.book_records enable row level security;
+
+-- 공개 기록은 누구나 / 본인 기록은 전권
+create policy cg_book_records_public on public.book_records
+  for select to anon, authenticated
+  using (visibility = 'public' and deleted_at is null);
+create policy cg_book_records_own on public.book_records
+  for all to authenticated
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- 관리자 조회/운영(비공개 전환)
+create policy cg_book_records_select_admin on public.book_records
+  for select using (public.cg_is_admin());
+create policy cg_book_records_update_admin on public.book_records
+  for update using (public.cg_is_admin()) with check (public.cg_is_admin());
+
+-- updated_at 자동 갱신 (06 에서 만든 공용 함수)
+create trigger book_records_touch before update on public.book_records
+  for each row execute function public.cg_touch_updated_at();
+
+grant select on public.book_records to anon;
+grant select, insert, update, delete on public.book_records to authenticated;
+grant all on public.book_records to service_role;
+
+-- 확인용
+-- select count(*) from public.book_records;
+-- select visibility, count(*) from public.book_records group by 1;</pre>
+        </div>
+      </div>
+    </div>
+
+  <!-- ========== 탭 6 (book 전용) ========== -->
+    <div class="admin-tab-panel" id="panel-records" style="display:none;">
+      <div class="admin-callout">
+        <div class="admin-callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="admin-callout-body">
+          <h4>독서기록 관리</h4>
+          <p>전체/공개/비공개/삭제 건수와 최근 기록을 확인하고, 부적절한 공개 기록은
+            <strong>비공개</strong>로 전환하거나 <strong>soft delete</strong>(deleted_at) 처리할 수 있어요.</p>
+        </div>
+      </div>
+      <div id="ar-content"><div class="loading">불러오는 중…</div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ================= 스크립트 ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-admin-client.js"></script>
+<script>
+  // 관리자 화면은 사용자용 script.js 를 로드하지 않습니다.
+  window.ADMIN_CONFIG = {
+    service: 'book',
+    adminEmails: ['phiskim@gmail.com'],
+    pageTitles: {
+      'index.html':  '홈',
+      'public.html': '공개 기록',
+      'records.html': '내 독서기록',
+      'write.html':  '기록 작성/수정',
+      'view.html':   '기록 상세',
+      'stats.html':  '통계',
+      'login.html':  '로그인 / 내 정보',
+      'admin.html':  '관리자'
+    },
+    activity: { kind: 'none' },
+    content: {
+      searchKind: 'pages',
+      stats: [
+        {
+          id: 'stat-content-pages',
+          compute: function () { return Object.keys(window.ADMIN_CONFIG.pageTitles).length + '개'; }
+        },
+        {
+          id: 'stat-content-top',
+          compute: function () {
+            var pv = (window.ADMIN_STATE && window.ADMIN_STATE.pageViews) || [];
+            if (!pv.length) return '—';
+            var cnt = {};
+            pv.forEach(function (r) {
+              var p = String(r.path || '').replace(/^\//, '') || 'index.html';
+              cnt[p] = (cnt[p] || 0) + 1;
+            });
+            var best = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; })[0];
+            return (window.ADMIN_CONFIG.pageTitles[best] || best) + ' (' + cnt[best] + '회)';
+          }
+        },
+        {
+          id: 'stat-content-logs',
+          compute: function () {
+            var pv = (window.ADMIN_STATE && window.ADMIN_STATE.pageViews) || [];
+            return pv.length ? pv.length.toLocaleString() + '건' : '—';
+          }
+        }
+      ]
+    }
+  };
+</script>
+<script src="js/admin.js"></script>
+<script src="js/admin-records.js"></script>
+</body>
+</html>
