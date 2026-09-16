@@ -23,6 +23,11 @@
   --radius-lg:  20px;
   --shadow:     0 1px 3px rgba(58, 48, 39, .06), 0 6px 18px rgba(58, 48, 39, .05);
 
+  /* 글꼴 (마음아 놀자와 동일) */
+  --font-serif: 'Noto Serif KR', serif;
+  --font-body: 'Gowun Dodum', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Noto Serif KR', serif;
+
   /* 공통 로그인 모듈(cg-auth.css)이 참조하는 토큰 */
   --cg-fg: var(--ink);
   --cg-muted: var(--muted);
@@ -43,8 +48,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
-               'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.65;
 }
@@ -66,6 +70,7 @@ body {
   gap: 8px;
   font-size: 20px;
   font-weight: 800;
+  font-family: var(--font-display);
   color: var(--ink);
   text-decoration: none;
   letter-spacing: -.02em;
@@ -164,6 +169,7 @@ body {
   margin: 0 0 10px;
   font-size: 30px;
   font-weight: 800;
+  font-family: var(--font-display);
   letter-spacing: -.02em;
   line-height: 1.3;
 }
@@ -174,7 +180,7 @@ body {
 /* ---------- 섹션 ---------- */
 .section { padding: 8px 0 26px; }
 .sec-head { text-align: center; margin: 6px 0 18px; }
-.sec-head h2 { margin: 0 0 4px; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.sec-head h2 { margin: 0 0 4px; font-size: 22px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.02em; }
 .sec-head p { margin: 0; color: var(--ink-soft); font-size: 15px; }
 
 /* ---------- 카드 ---------- */
@@ -222,9 +228,9 @@ body {
   font-size: 12px; font-weight: 700; letter-spacing: .12em;
   color: var(--key); text-transform: uppercase;
 }
-h1.page-title { margin: 4px 0 6px; font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+h1.page-title { margin: 4px 0 6px; font-size: 26px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.02em; }
 .page-desc { margin: 0 0 18px; color: var(--ink-soft); font-size: 15px; }
-h2.sec-title { margin: 26px 0 10px; font-size: 18px; font-weight: 800; }
+h2.sec-title { margin: 26px 0 10px; font-size: 18px; font-weight: 800; font-family: var(--font-display); }
 
 /* ---------- 버튼 ---------- */
 .btn {
@@ -387,7 +393,7 @@ h2.sec-title { margin: 26px 0 10px; font-size: 18px; font-weight: 800; }
 
 /* ---------- 상세 보기 ---------- */
 .detail-head { margin-bottom: 6px; }
-.detail-title { margin: 0 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.detail-title { margin: 0 0 8px; font-size: 26px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.02em; }
 .detail-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; color: var(--muted); font-size: 13px; }
 .detail-meta .kv { background: var(--bg); border-radius: 999px; padding: 3px 10px; }
 .one-line {
@@ -409,7 +415,7 @@ h2.sec-title { margin: 26px 0 10px; font-size: 18px; font-weight: 800; }
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px;
 }
-.stat-card .num { font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--key); }
+.stat-card .num { font-size: 26px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.02em; color: var(--key); }
 .stat-card .label { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .bar-row .bar-label { flex: 0 0 110px; font-size: 13px; color: var(--ink-soft); }
