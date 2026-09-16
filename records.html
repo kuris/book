@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 독서기록 - 독서야 놀자!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cg-auth.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">📚 독서야 놀자!</div>
+            <nav id="main-nav"></nav>
+            <div id="cg-auth-slot"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="container">
+            <h1>내 독서기록</h1>
+            <div id="auth-required" style="display: none;">
+                <p>이 페이지는 로그인해야 이용할 수 있습니다. <button class="btn btn-primary" data-cg="login">Google로 로그인</button></p>
+            </div>
+            <div id="records-content" style="display: none;">
+                <div class="controls">
+                    <div class="filter-group">
+                        <label for="status-filter">상태:</label>
+                        <select id="status-filter">
+                            <option value="all">전체</option>
+                            <option value="want">읽고 싶은 책</option>
+                            <option value="reading">읽는 중</option>
+                            <option value="done">다 읽음</option>
+                            <option value="paused">잠시 멈춤</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="visibility-filter">공개 여부:</label>
+                        <select id="visibility-filter">
+                            <option value="all">전체</option>
+                            <option value="private">비공개</option>
+                            <option value="public">공개</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="search-input" placeholder="제목, 저자, 한 줄 리뷰 검색">
+                        <button id="search-button" class="btn btn-secondary">검색</button>
+                    </div>
+                    <div class="sort-group">
+                        <label for="sort-by">정렬:</label>
+                        <select id="sort-by">
+                            <option value="created_at_desc">최신순</option>
+                            <option value="reading_date_desc">읽은 날짜순</option>
+                            <option value="rating_desc">별점순</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="record-list-grid">
+                    <!-- Records will be loaded here by records.js -->
+                    <p id="no-records" style="display: none;">아직 기록이 없습니다. 새로운 기록을 추가해보세요!</p>
+                </div>
+                <a href="write.html" class="btn btn-primary add-record-btn">새 기록 쓰기</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 독서야 놀자!</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="js/nav.js"></script>
+    <script defer src="js/cg-auth.js" data-service="book" data-mount="#cg-auth-slot"></script>
+    <script defer src="js/book-data.js"></script>
+    <script defer src="js/records.js"></script>
+</body>
+</html>

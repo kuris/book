@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>독서야 놀자! - 책 읽고 기록하는 어린이 독서장</title>
+<meta name="description" content="읽은 책을 한 줄 느낌, 줄거리, 기억에 남는 문장, 느낀 점으로 차근차근 기록하는 독서기록 서비스입니다.">
+<link rel="canonical" href="https://book.chatgpts.kr/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="독서야 놀자">
+<meta property="og:title" content="독서야 놀자!">
+<meta property="og:description" content="오늘 읽은 책, 한 줄부터 기록해요.">
+<meta property="og:url" content="https://book.chatgpts.kr/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/cg-auth.css">
+
+<meta name="google-adsense-account" content="ca-pub-3321070604000141">
+<script defer src="js/cg-ads.js" data-client="ca-pub-3321070604000141"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-head">
+    <a href="index.html" class="brand-logo">
+      <span class="logo-char">📚</span>
+      <span>독서야 <span class="dot">놀자</span></span>
+    </a>
+    <div class="header-right"></div>
+  </header>
+
+  <nav class="nav-scroll" id="book-nav" aria-label="주요 메뉴"></nav>
+
+  <section class="hero">
+    <span class="hero-badge">📖 오늘부터 한 줄 기록!</span>
+    <h1>오늘 읽은 책,<br>한 줄부터 <span class="dot">기록</span>해요</h1>
+    <p>줄거리, 느낀 점, 기억에 남는 문장을 차근차근 남겨요.<br>내가 읽은 책들이 차곡차곡 나만의 책장이 됩니다.</p>
+    <div class="hero-actions">
+      <a href="write.html" class="btn btn-primary">✍️ 기록 쓰기</a>
+      <a href="records.html" class="btn btn-outline">📂 내 독서기록</a>
+      <a href="public.html" class="btn btn-accent">🌍 공개 기록 둘러보기</a>
+    </div>
+  </section>
+
+  <section class="section" aria-label="서비스 특징">
+    <div class="sec-head">
+      <h2>어떤 기능이 있나요?</h2>
+      <p>로그인하면 어느 기기에서든 내 독서기록이 그대로 이어져요.</p>
+    </div>
+    <ul class="menu-grid">
+      <li><a href="write.html"><span class="emoji">✍️</span><span class="label">한 줄 기록</span><span class="sub">오늘 읽은 책 바로 적기</span></a></li>
+      <li><a href="write.html"><span class="emoji">🧩</span><span class="label">독서노트 정리</span><span class="sub">줄거리·감상·문장 저장</span></a></li>
+      <li><a href="records.html"><span class="emoji">🔖</span><span class="label">나만의 책장</span><span class="sub">내 기록 목록·검색</span></a></li>
+      <li><a href="stats.html"><span class="emoji">📊</span><span class="label">독서 통계</span><span class="sub">읽은 책과 별점 한눈에</span></a></li>
+      <li><a href="public.html"><span class="emoji">🌍</span><span class="label">공개 기록</span><span class="sub">다른 사람 기록 구경</span></a></li>
+      <li><a href="login.html"><span class="emoji">🔐</span><span class="label">로그인</span><span class="sub">Google로 계정 저장</span></a></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="sec-head">
+      <h2>🌍 최근 공개 독서기록</h2>
+      <p>다른 친구들이 남긴 따뜻한 기록을 구경해 보세요.</p>
+    </div>
+    <div id="home-public" class="record-grid"></div>
+  </section>
+
+  <div id="book-recent"></div>
+
+  <div class="source-note" style="margin:22px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:#faf6ee;color:var(--ink-soft);font-size:13px;line-height:1.7;">
+    <strong>이 서비스는 AI 기능이 없어요.</strong><br>
+    "작성 가이드" 는 AI 가 아니라, 기록을 쉽게 쓰도록 돕는 <strong>질문과 독서 템플릿</strong>이에요.
+    모든 기록은 내가 직접 쓰고, 내 계정에 안전하게 보관돼요.
+  </div>
+
+  <footer class="site-foot">
+    <div class="foot-links">
+        <a href="https://hanja.chatgpts.kr" target="_blank" rel="noopener">📖 한자야 놀자</a>
+        <a href="https://voca.chatgpts.kr" target="_blank" rel="noopener">⚡ 단어야 놀자</a>
+        <a href="https://history.chatgpts.kr" target="_blank" rel="noopener">📜 역사야 놀자</a>
+        <a href="https://fortune.chatgpts.kr" target="_blank" rel="noopener">🔮 운세야 놀자</a>
+        <a href="https://mind.chatgpts.kr" target="_blank" rel="noopener">🧠 마인드테스트</a>
+        <a href="https://work.chatgpts.kr" target="_blank" rel="noopener">💼 워크야 놀자</a>
+        <a href="https://money.chatgpts.kr" target="_blank" rel="noopener">💰 머니야 놀자</a>
+        <a href="https://tools.chatgpts.kr" target="_blank" rel="noopener">🛠️ 문서야 놀자</a>
+        <a href="https://bible.chatgpts.kr" target="_blank" rel="noopener">✝️ 성경아 놀자</a>
+        <a href="https://maum.chatgpts.kr" target="_blank" rel="noopener">🪷 마음아 놀자</a>
+        <a href="https://chatgpts.kr" target="_blank" rel="noopener">🏠 chatgpts.kr</a>
+    </div>
+    <p>© 2026 독서야 놀자! (book.chatgpts.kr) · 책 읽고 기록하는 독서장</p>
+  </footer>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="js/supabase-config.js"></script>
+<script defer src="js/cg-auth.js" data-service="book" data-mount=".header-right" data-mount-mode="append" data-my-page="records.html" data-hint="로그인하면 내 독서기록이 계정에 저장돼요."></script>
+<script defer src="js/book-data.js"></script>
+<script defer src="js/book-sync.js"></script>
+<script defer src="js/nav.js"></script>
+<script defer src="js/main.js"></script>
+<script defer src="js/track.js" data-service="book"></script>
+</body>
+</html>

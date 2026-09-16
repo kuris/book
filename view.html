@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서기록 상세 - 독서야 놀자!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cg-auth.css">
+    <style>
+        .record-detail-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .record-detail-card h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .record-meta {
+            color: var(--light-text-color);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .record-meta span {
+            margin-right: 15px;
+        }
+        .one-line-review-highlight {
+            font-style: italic;
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--background-color);
+            border-left: 5px solid var(--accent-color);
+            border-radius: 5px;
+        }
+        .detail-section {
+            margin-top: 25px;
+        }
+        .detail-section h2 {
+            font-size: 1.5em;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+        }
+        .detail-section p {
+            white-space: pre-wrap;
+        }
+        .action-buttons {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .action-buttons .btn {
+            margin-left: 10px;
+        }
+        #auth-required {
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">📚 독서야 놀자!</div>
+            <nav id="main-nav"></nav>
+            <div id="cg-auth-slot"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="container">
+            <div id="auth-required" style="display: none;">
+                <p>이 기록을 보려면 로그인해야 합니다. <button class="btn btn-primary" data-cg="login">Google로 로그인</button></p>
+            </div>
+            <div id="record-detail" class="record-detail-card" style="display: none;">
+                <h1 id="detail-title"></h1>
+                <div class="record-meta">
+                    <span id="detail-author"></span>
+                    <span id="detail-publisher"></span>
+                    <span id="detail-category"></span>
+                    <span id="detail-status"></span>
+                    <span id="detail-rating"></span>
+                    <span id="detail-reading-date"></span>
+                    <span id="detail-visibility"></span>
+                </div>
+                <p class="one-line-review-highlight" id="detail-one-line-review"></p>
+
+                <div id="section-summary" class="detail-section">
+                    <h2>줄거리 요약</h2>
+                    <p id="detail-summary"></p>
+                </div>
+                <div id="section-memorable-sentence" class="detail-section">
+                    <h2>기억에 남는 문장</h2>
+                    <p id="detail-memorable-sentence"></p>
+                </div>
+                <div id="section-feeling" class="detail-section">
+                    <h2>느낀 점</h2>
+                    <p id="detail-feeling"></p>
+                </div>
+                <div id="section-learned" class="detail-section">
+                    <h2>배운 점</h2>
+                    <p id="detail-learned"></p>
+                </div>
+                <div id="section-action-plan" class="detail-section">
+                    <h2>나에게 적용할 점</h2>
+                    <p id="detail-action-plan"></p>
+                </div>
+                <div id="section-favorite-character" class="detail-section">
+                    <h2>좋아하는 인물</h2>
+                    <p id="detail-favorite-character"></p>
+                </div>
+                <div id="section-question" class="detail-section">
+                    <h2>읽고 난 뒤 생긴 질문</h2>
+                    <p id="detail-question-after-reading"></p>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="edit-btn" class="btn btn-secondary" style="display: none;">수정</button>
+                    <button id="delete-btn" class="btn btn-tertiary" style="display: none;">삭제</button>
+                    <a href="records.html" class="btn btn-default">목록으로</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 독서야 놀자!</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="js/nav.js"></script>
+    <script defer src="js/cg-auth.js" data-service="book" data-mount="#cg-auth-slot"></script>
+    <script defer src="js/book-data.js"></script>
+    <script defer src="js/view.js"></script>
+</body>
+</html>
