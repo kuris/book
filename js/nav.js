@@ -16,20 +16,7 @@
     { label: '내 정보', href: 'login.html', emoji: '👤' }
   ];
 
-  // 자기(book)를 제외한 형제 서비스 (다른 놀자 드롭다운용)
-  var FAMILY = [
-    { emoji: '📖', label: '한자야 놀자',  url: 'https://hanja.chatgpts.kr' },
-    { emoji: '⚡', label: '단어야 놀자',  url: 'https://voca.chatgpts.kr' },
-    { emoji: '📜', label: '역사야 놀자',  url: 'https://history.chatgpts.kr' },
-    { emoji: '🔮', label: '운세야 놀자',  url: 'https://fortune.chatgpts.kr' },
-    { emoji: '🧠', label: '마인드테스트', url: 'https://mind.chatgpts.kr' },
-    { emoji: '💼', label: '워크야 놀자',  url: 'https://work.chatgpts.kr' },
-    { emoji: '💰', label: '머니야 놀자',  url: 'https://money.chatgpts.kr' },
-    { emoji: '🛠️', label: '문서야 놀자',  url: 'https://tools.chatgpts.kr' },
-    { emoji: '✝️', label: '성경아 놀자',  url: 'https://bible.chatgpts.kr' },
-    { emoji: '🪷', label: '마음아 놀자',  url: 'https://maum.chatgpts.kr' },
-    { emoji: '🏠', label: 'chatgpts.kr',  url: 'https://chatgpts.kr' }
-  ];
+  // 15종 풀셋 패밀리는 cg-family.js 공유 모듈이 렌더 (data-cg-family 컨테이너)
 
   function currentFile() {
     var f = location.pathname.split('/').pop() || 'index.html';
@@ -48,38 +35,17 @@
     }).join('');
   }
 
-  // 헤더 우측 "다른 놀자 서비스" 드롭다운
+  // 헤더 우측 "다른 놀자 서비스" 드롭다운 (cg-family.js 공유 모듈)
   function renderFamily() {
     var host = document.querySelector('.header-right');
-    if (!host || document.getElementById('family-nav')) return;
-    var wrap = document.createElement('div');
-    wrap.id = 'family-nav';
-    var links = FAMILY.map(function (s) {
-      return '<a href="' + s.url + '" target="_blank" rel="noopener"><span>' + s.emoji + '</span> <span>' + s.label + '</span></a>';
-    }).join('');
-    wrap.innerHTML =
-      '<button type="button" id="family-btn" aria-expanded="false">🎡 다른 놀자 ▾</button>' +
-      '<div class="family-dropdown">' + links + '</div>';
-    host.appendChild(wrap);
-
-    var btn = wrap.querySelector('#family-btn');
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var open = wrap.classList.toggle('open');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    document.addEventListener('click', function (e) {
-      if (!wrap.contains(e.target)) {
-        wrap.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        wrap.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
-    });
+    if (!host || host.querySelector('[data-cg-family]')) return;
+    var box = document.createElement('div');
+    box.setAttribute('data-cg-family', '');
+    box.setAttribute('data-current', 'book');
+    // flex order로 로그인 위젯(CGAuth append)과 순서 고정: 패밀리가 항상 마지막
+    box.style.order = '99';
+    host.appendChild(box);
+    if (window.CGFamily) window.CGFamily.renderInto(box, { current: 'book' });
   }
 
   if (document.readyState === 'loading') {
