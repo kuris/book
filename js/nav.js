@@ -16,7 +16,7 @@
     { label: '내 정보', href: 'login.html', emoji: '👤' }
   ];
 
-  // 15종 풀셋 패밀리는 cg-family.js 공유 모듈이 렌더 (data-cg-family 컨테이너)
+  // 14종 패밀리는 cg-family.js 공유 모듈이 렌더 (data-cg-family 컨테이너)
 
   function currentFile() {
     var f = location.pathname.split('/').pop() || 'index.html';
